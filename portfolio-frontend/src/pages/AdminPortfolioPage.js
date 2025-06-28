@@ -1,89 +1,280 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, Paper, IconButton } from '@mui/material';
+import {
+  Container, Typography, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, Paper, IconButton,
+  Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress, Grid
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+
+const BACKEND_URL = 'http://localhost:5000';
 
 const AdminPortfolioPage = () => {
   const [portfolios, setPortfolios] = useState([]);
-  const [formState, setFormState] = useState({ project_name: '', description: '', image_url: '', project_link: '', tags: '' });
+  const [loading, setLoading] = useState(true);
   
+  // State untuk Dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State untuk Form & File
+  const [formData, setFormData] = useState({});
+  const [mainImageFile, setMainImageFile] = useState(null);
+  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
+  const [existingGallery, setExistingGallery] = useState([]);
+
+
   const fetchPortfolios = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/portfolio');
-      setPortfolios(response.data);
-    } catch (error) { console.error("Gagal fetch portfolio:", error); }
+      const res = await axios.get(`${BACKEND_URL}/api/portfolio`);
+      setPortfolios(res.data);
+    } catch (error) { console.error("Gagal mengambil data portfolio:", error); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => { fetchPortfolios(); }, []);
 
-  const handleInputChange = (e) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+  const resetForm = () => {
+    setFormData({ project_name: '', description: '', project_link: '', tags: '' });
+    setMainImageFile(null);
+    setGalleryImageFiles([]);
+    setExistingGallery([]);
+    setIsEditMode(false);
+  };
+
+  const handleOpenAddDialog = () => {
+    resetForm();
+    setIsDialogOpen(true);
+  };
+  
+  const handleOpenEditDialog = async (portfolio) => {
+    resetForm();
+    setIsEditMode(true);
+    // Ambil data detail dari backend
+    try {
+      const res = await axios.get(`${BACKEND_URL}/api/portfolio/${portfolio.id}`);
+      setFormData(res.data); // res.data berisi semua field multi-bahasa
+      const galleryRes = await axios.get(`${BACKEND_URL}/api/portfolio/${portfolio.id}/images`);
+      setExistingGallery(galleryRes.data);
+    } catch (error) {
+      console.error("Gagal mengambil data detail atau gambar galeri:", error);
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    resetForm();
+  };
+
+  const resetAndClose = () => {
+    handleCloseDialog();
+    resetForm();
+  };
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleMainImageChange = (e) => setMainImageFile(e.target.files[0]);
+  const handleGalleryFilesChange = (e) => setGalleryImageFiles([...e.target.files]);
+
+  const uploadFile = async (file) => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('image', file);
+    const token = localStorage.getItem('authToken');
+    const res = await axios.post(`${BACKEND_URL}/api/upload`, uploadFormData, {
+      headers: { 'Content-Type': 'multipart/form-data', Authorization: token },
+    });
+    return res.data.filePath;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const token = localStorage.getItem('authToken');
+    let dataToSubmit = { ...formData };
+
     try {
-      await axios.post('http://localhost:5000/api/portfolio', formState, { headers: { Authorization: token } });
-      alert('Proyek berhasil ditambahkan!');
-      setFormState({ project_name: '', description: '', image_url: '', project_link: '', tags: '' });
+      // 1. Upload gambar utama jika ada
+      if (mainImageFile) {
+        dataToSubmit.image_url = await uploadFile(mainImageFile);
+      }
+
+      // 2. Simpan/Update data utama portfolio
+      let portfolioResponse;
+      if (isEditMode) {
+        portfolioResponse = await axios.put(`${BACKEND_URL}/api/portfolio/${formData.id}`, dataToSubmit, { headers: { Authorization: token } });
+      } else {
+        portfolioResponse = await axios.post(`${BACKEND_URL}/api/portfolio`, dataToSubmit, { headers: { Authorization: token } });
+      }
+      const portfolioId = isEditMode ? formData.id : portfolioResponse.data.id;
+
+      // 3. Upload gambar galeri baru jika ada
+      if (galleryImageFiles.length > 0) {
+        for (const file of galleryImageFiles) {
+          const galleryImageUrl = await uploadFile(file);
+          await axios.post(`${BACKEND_URL}/api/portfolio/${portfolioId}/images`, { image_url: galleryImageUrl }, { headers: { Authorization: token } });
+        }
+      }
+
+      alert(`Proyek berhasil ${isEditMode ? 'diupdate' : 'disimpan'}!`);
+      handleCloseDialog();
       fetchPortfolios();
+
     } catch (error) {
-      alert('Gagal menambah proyek.');
+      alert(`Gagal menyimpan proyek.`);
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus proyek ini?")) {
-      const token = localStorage.getItem('authToken');
-      try {
-        await axios.delete(`http://localhost:5000/api/portfolio/${id}`, { headers: { Authorization: token } });
-        alert('Proyek berhasil dihapus!');
-        fetchPortfolios();
-      } catch (error) {
-        alert('Gagal menghapus proyek.');
-        console.error(error);
-      }
-    }
+  
+  const handleDeleteGalleryImage = async (imageId) => {
+      // Logika untuk menghapus gambar dari galeri
   };
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>Manajemen Portfolio</Typography>
-      <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-        <Box component="form" onSubmit={handleSubmit}>
-          <Typography variant="h6">Tambah Proyek Baru</Typography>
-          <TextField label="Nama Proyek" name="project_name" value={formState.project_name} onChange={handleInputChange} fullWidth margin="normal" required />
-          <TextField label="Deskripsi" name="description" value={formState.description} onChange={handleInputChange} fullWidth margin="normal" multiline rows={4} />
-          <TextField label="URL Gambar" name="image_url" value={formState.image_url} onChange={handleInputChange} fullWidth margin="normal" />
-          <TextField label="Link Proyek" name="project_link" value={formState.project_link} onChange={handleInputChange} fullWidth margin="normal" />
-          <TextField label="Tags (pisahkan koma)" name="tags" value={formState.tags} onChange={handleInputChange} fullWidth margin="normal" />
-          <Button type="submit" variant="contained" color="primary">Tambah Proyek</Button>
-        </Box>
-      </Paper>
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nama Proyek</TableCell><TableCell>Tags</TableCell><TableCell>Aksi</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {portfolios.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell>{p.project_name}</TableCell>
-                <TableCell>{p.tags}</TableCell>
-                <TableCell>
-                  <IconButton color="primary"><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(p.id)}><DeleteIcon /></IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" gutterBottom>Manajemen Portfolio</Typography>
+        <Button variant="contained" onClick={handleOpenAddDialog}>Tambah Proyek Baru</Button>
+      </Box>
+
+      {loading ? <CircularProgress /> : (
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow><TableCell>Gambar</TableCell><TableCell>Nama Proyek</TableCell><TableCell>Aksi</TableCell></TableRow>
+            </TableHead>
+            <TableBody>
+              {portfolios.map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell><img src={`${BACKEND_URL}${p.image_url}`} alt={p.project_name} style={{ width: '100px', height: 'auto' }} /></TableCell>
+                  <TableCell>{p.project_name}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleOpenEditDialog(p)}><EditIcon /></IconButton>
+                    <IconButton color="error"><DeleteIcon /></IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
+
+      {/* Dialog untuk Tambah/Edit */}
+      <Dialog open={isDialogOpen} onClose={resetAndClose} fullWidth maxWidth="md">
+        <DialogTitle>{isEditMode ? 'Edit Proyek' : 'Tambah Proyek Baru'}</DialogTitle>
+        <DialogContent>
+          <Box component="form" id="portfolio-form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            {/* --- KONTEN BAHASA INDONESIA --- */}
+            <Typography variant="h6">Bahasa Indonesia</Typography>
+            <TextField 
+              label="Nama Proyek (ID)" 
+              name="project_name_id" 
+              value={formData.project_name_id || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+              required 
+            />
+            <TextField 
+              label="Deskripsi (ID)" 
+              name="description_id" 
+              value={formData.description_id || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+              multiline 
+              rows={4} 
+            />
+            <TextField 
+              label="Tags (ID)" 
+              name="tags_id" 
+              value={formData.tags_id || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            
+            <hr style={{margin: '2rem 0'}}/>
+
+            {/* --- KONTEN BAHASA INGGRIS --- */}
+            <Typography variant="h6">Bahasa Inggris</Typography>
+            <TextField 
+              label="Project Name (EN)" 
+              name="project_name_en" 
+              value={formData.project_name_en || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            <TextField 
+              label="Description (EN)" 
+              name="description_en" 
+              value={formData.description_en || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+              multiline 
+              rows={4} 
+            />
+            <TextField 
+              label="Tags (EN)" 
+              name="tags_en" 
+              value={formData.tags_en || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            
+            <hr style={{margin: '2rem 0'}}/>
+            
+            {/* --- PENGATURAN LAINNYA --- */}
+            <Typography variant="h6">Pengaturan Lainnya</Typography>
+            <TextField 
+              label="Link Proyek" 
+              name="project_link" 
+              value={formData.project_link || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            <Button variant="outlined" component="label" sx={{ mt: 1 }}>
+              Upload Gambar Utama
+              <input type="file" hidden onChange={handleMainImageChange} accept="image/*" />
+            </Button>
+            {mainImageFile && <Typography variant="caption" sx={{ ml: 2 }}>{mainImageFile.name}</Typography>}
+
+            {isEditMode && (
+              <Box mt={4}>
+                <Typography variant="h6">Manajemen Galeri</Typography>
+                <Grid container spacing={2} sx={{ my: 1 }}>
+                  {existingGallery.map(img => (
+                    <Grid item key={img.id}>
+                      <Paper sx={{ p: 0.5, position: 'relative' }}>
+                        <img src={`${BACKEND_URL}${img.image_url}`} alt="galeri" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                        <IconButton size="small" sx={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,255,255,0.7)' }} onClick={() => handleDeleteGalleryImage(img.id)}><CloseIcon fontSize="small"/></IconButton>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+                <Button variant="outlined" component="label">
+                  Tambah Gambar Galeri
+                  <input type="file" hidden multiple onChange={handleGalleryFilesChange} accept="image/*" />
+                </Button>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={resetAndClose}>Batal</Button>
+          <Button type="submit" form="portfolio-form" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? <CircularProgress size={24} /> : 'Simpan'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

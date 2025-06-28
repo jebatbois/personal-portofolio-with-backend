@@ -11,3 +11,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body {
+  cursor: default;
+}
+
+/* Sembunyikan caret di seluruh elemen input, textarea, dan contenteditable */
+input, textarea, [contenteditable], *:focus {
+  caret-color: transparent !important;
+}

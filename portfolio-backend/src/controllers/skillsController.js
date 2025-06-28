@@ -1,43 +1,50 @@
 // src/controllers/skillsController.js
 const db = require('../config/db');
 
-// GET all skills (sudah ada)
-exports.getAllSkills = async (req, res) => { /* ... kode Anda ... */ };
-
-// --- TAMBAHKAN FUNGSI-FUNGSI DI BAWAH INI ---
-
-// @desc    Buat skill baru
-// @route   POST /api/skills
-// @access  Private
-exports.createSkill = async (req, res) => {
-  const { skill_name, percentage } = req.body;
+// Mengambil data skill dengan bahasa dinamis
+exports.getAllSkills = async (req, res) => {
   try {
-    const sql = 'INSERT INTO skills (skill_name, percentage) VALUES (?, ?)';
-    const [result] = await db.query(sql, [skill_name, percentage]);
+    const lang = req.query.lang === 'en' ? 'en' : 'id'; // Default ke 'id'
+    const nameCol = `skill_name_${lang}`;
+
+    // Gunakan 'AS' untuk menjaga nama key di JSON tetap 'skill_name' untuk frontend
+    const sql = `SELECT id, ${nameCol} as skill_name, percentage FROM skills ORDER BY percentage DESC`;
+    
+    const [rows] = await db.query(sql);
+    res.status(200).json(rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};
+
+// Membuat skill baru dengan kolom _id dan _en
+exports.createSkill = async (req, res) => {
+  // Ambil data dari body dengan nama kolom yang sudah benar
+  const { skill_name_id, skill_name_en, percentage } = req.body;
+  try {
+    // Gunakan nama kolom yang benar di query SQL
+    const sql = 'INSERT INTO skills (skill_name_id, skill_name_en, percentage) VALUES (?, ?, ?)';
+    const [result] = await db.query(sql, [skill_name_id, skill_name_en, percentage]);
     res.status(201).json({ id: result.insertId, ...req.body });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }
 };
 
-// @desc    Update data skill
-// @route   PUT /api/skills/:id
-// @access  Private
+// Mengupdate skill dengan kolom _id dan _en
 exports.updateSkill = async (req, res) => {
   const { id } = req.params;
-  const { skill_name, percentage } = req.body;
+  const { skill_name_id, skill_name_en, percentage } = req.body;
   try {
-    const sql = 'UPDATE skills SET skill_name = ?, percentage = ? WHERE id = ?';
-    await db.query(sql, [skill_name, percentage, id]);
+    const sql = 'UPDATE skills SET skill_name_id = ?, skill_name_en = ?, percentage = ? WHERE id = ?';
+    await db.query(sql, [skill_name_id, skill_name_en, percentage, id]);
     res.status(200).json({ message: 'Skill berhasil diupdate' });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }
 };
 
-// @desc    Hapus data skill
-// @route   DELETE /api/skills/:id
-// @access  Private
+// Hapus skill (tidak ada perubahan signifikan di sini)
 exports.deleteSkill = async (req, res) => {
   const { id } = req.params;
   try {

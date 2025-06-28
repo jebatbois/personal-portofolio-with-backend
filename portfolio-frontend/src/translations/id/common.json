@@ -1,0 +1,9 @@
+{
+  "nav_home": "Beranda",
+  "nav_articles": "Artikel",
+  "nav_contact": "Kontak",
+  "hero_greeting": "Halo, saya {{name}}.",
+  "hero_bio": "Seorang developer yang bersemangat untuk menciptakan hal-hal luar biasa.",
+  "skills_title": "Keahlian",
+  "resume_title": "Riwayat"
+}

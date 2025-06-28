@@ -3,85 +3,69 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Container, Typography, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, Paper, IconButton, Slider,
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle // Import komponen Dialog
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, // <-- PERBAIKAN ADA DI SINI
+  LinearProgress,
+  Alert
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 const AdminSkillsPage = () => {
   const [skills, setSkills] = useState([]);
-  // State untuk form tambah
-  const [newSkill, setNewSkill] = useState({ skill_name: '', percentage: 50 });
-  // State untuk dialog edit
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [newSkill, setNewSkill] = useState({ skill_name_id: '', skill_name_en: '', percentage: 50 });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentSkill, setCurrentSkill] = useState(null);
 
-  const fetchSkills = async () => { /* ... sama seperti sebelumnya ... */ };
-  useEffect(() => { fetchSkills(); }, []);
-
-  const handleNewSkillChange = (e) => {
-    setNewSkill({ ...newSkill, [e.target.name]: e.target.value });
+  const fetchSkills = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.get('http://localhost:5000/api/skills');
+      setSkills(response.data);
+    } catch (err) {
+      console.error("GAGAL MENGAMBIL DATA SKILLS:", err);
+      setError('Gagal memuat data. Cek pesan error di console (F12).');
+    } finally {
+      setLoading(false);
+    }
   };
-  const handleNewSkillSliderChange = (e, newValue) => {
-    setNewSkill({ ...newSkill, percentage: newValue });
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const handleNewSkillChange = (e) => setNewSkill({ ...newSkill, [e.target.name]: e.target.value });
+  const handleNewSkillSliderChange = (e, newValue) => setNewSkill({ ...newSkill, percentage: newValue });
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('authToken');
+    try {
+      const response = await axios.post('http://localhost:5000/api/skills', newSkill, { headers: { Authorization: token } });
+      setSkills(prevSkills => [...prevSkills, response.data]);
+      setNewSkill({ skill_name_id: '', skill_name_en: '', percentage: 50 });
+      alert('Skill berhasil ditambahkan!');
+    } catch (error) { alert('Gagal menambah skill.'); }
   };
-
- const handleAddSubmit = async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('authToken');
-  try {
-    // 1. Tangkap response dari backend saat membuat skill baru
-    const response = await axios.post('http://localhost:5000/api/skills', newSkill, { 
-      headers: { Authorization: token } 
-    });
-
-    // 2. Ambil data skill yang baru dibuat (lengkap dengan ID dari database) dari response
-    const addedSkill = response.data;
-
-    // 3. Update state 'skills' secara manual
-    //    Ini memberitahu React: "Ambil semua skill yang lama (...prevSkills), lalu tambahkan skill baru ini di akhir"
-    setSkills(prevSkills => [...prevSkills, addedSkill]);
-
-    // 4. Beri notifikasi dan reset form
-    alert('Skill berhasil ditambahkan!');
-    setNewSkill({ skill_name: '', percentage: 50 });
-
-  } catch (error) { 
-    alert('Gagal menambah skill.'); 
-    console.error(error);
-  }
-};
 
   const handleDelete = async (id) => {
     if (window.confirm("Yakin ingin menghapus skill ini?")) {
       const token = localStorage.getItem('authToken');
       try {
         await axios.delete(`http://localhost:5000/api/skills/${id}`, { headers: { Authorization: token } });
+        setSkills(prevSkills => prevSkills.filter(skill => skill.id !== id));
         alert('Skill berhasil dihapus!');
-        fetchSkills();
       } catch (error) { alert('Gagal menghapus skill.'); }
     }
   };
 
-  // --- FUNGSI UNTUK EDIT ---
-  const handleOpenEditDialog = (skill) => {
-    setCurrentSkill(skill);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false);
-    setCurrentSkill(null);
-  };
-
-  const handleEditChange = (e) => {
-    setCurrentSkill({ ...currentSkill, [e.target.name]: e.target.value });
-  };
+  const handleOpenEditDialog = (skill) => { setCurrentSkill({ ...skill }); setIsEditDialogOpen(true); };
+  const handleCloseEditDialog = () => setIsEditDialogOpen(false);
+  const handleEditChange = (e) => setCurrentSkill({ ...currentSkill, [e.target.name]: e.target.value });
+  const handleEditSliderChange = (e, newValue) => setCurrentSkill({ ...currentSkill, percentage: newValue });
   
-  const handleEditSliderChange = (e, newValue) => {
-    setCurrentSkill({ ...currentSkill, percentage: newValue });
-  };
-
   const handleUpdateSubmit = async () => {
     if (!currentSkill) return;
     const token = localStorage.getItem('authToken');
@@ -93,52 +77,90 @@ const AdminSkillsPage = () => {
     } catch (error) { alert('Gagal mengupdate skill.'); }
   };
 
-
   return (
     <Container>
       <Typography variant="h4" gutterBottom>Manajemen Skills</Typography>
-      
-      {/* Form Tambah */}
       <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
         <Box component="form" onSubmit={handleAddSubmit}>
           <Typography variant="h6">Tambah Skill Baru</Typography>
-          <TextField label="Nama Skill" name="skill_name" value={newSkill.skill_name} onChange={handleNewSkillChange} fullWidth margin="normal" required />
-          <Typography gutterBottom>Persentase Keahlian: {newSkill.percentage}%</Typography>
+          
+          <Typography variant="h6">Konten Bahasa Indonesia</Typography>
+          <TextField
+            label="Nama Skill (ID)"
+            name="skill_name_id"
+            value={newSkill.skill_name_id || ''}
+            onChange={handleNewSkillChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+
+          <Typography variant="h6" sx={{ mt: 4 }}>Konten Bahasa Inggris</Typography>
+          <TextField
+            label="Skill Name (EN)"
+            name="skill_name_en"
+            value={newSkill.skill_name_en || ''}
+            onChange={handleNewSkillChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+
+          <Typography gutterBottom sx={{ mt: 3 }}>Persentase Keahlian: {newSkill.percentage}%</Typography>
           <Slider name="percentage" value={newSkill.percentage} onChange={handleNewSkillSliderChange} valueLabelDisplay="auto" />
+
           <Button type="submit" variant="contained" color="primary">Tambah Skill</Button>
         </Box>
       </Paper>
       
-      {/* Tabel Data */}
-      <Paper>
-        <Table>
-          <TableHead><TableRow><TableCell>Nama Skill</TableCell><TableCell>Persentase</TableCell><TableCell>Aksi</TableCell></TableRow></TableHead>
-          <TableBody>
-            {skills.map((skill) => (
-              <TableRow key={skill.id}>
-                <TableCell>{skill.skill_name}</TableCell>
-                <TableCell>{skill.percentage}%</TableCell>
-                <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpenEditDialog(skill)}><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(skill.id)}><DeleteIcon /></IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
+      {loading && <LinearProgress sx={{ mt: 2 }} />} 
+      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+      
+      {!loading && !error && (
+        <Paper>
+          <Table>
+            <TableHead><TableRow><TableCell>Nama Skill</TableCell><TableCell>Persentase</TableCell><TableCell>Aksi</TableCell></TableRow></TableHead>
+            <TableBody>
+              {skills.map((skill) => (
+                <TableRow key={skill.id}>
+                  <TableCell>{skill.skill_name}</TableCell>
+                  <TableCell>{skill.percentage}%</TableCell>
+                  <TableCell>
+                    <IconButton color="primary" onClick={() => handleOpenEditDialog(skill)}><EditIcon /></IconButton>
+                    <IconButton color="error" onClick={() => handleDelete(skill.id)}><DeleteIcon /></IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
-      {/* Dialog untuk Edit */}
       <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog}>
         <DialogTitle>Edit Skill</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{mb: 2}}>
             Silakan ubah detail skill di bawah ini.
           </DialogContentText>
           {currentSkill && (
-            <Box sx={{mt: 2}}>
-              <TextField label="Nama Skill" name="skill_name" value={currentSkill.skill_name} onChange={handleEditChange} fullWidth margin="normal" />
-              <Typography gutterBottom>Persentase Keahlian: {currentSkill.percentage}%</Typography>
+            <Box>
+              <TextField
+                label="Nama Skill (ID)"
+                name="skill_name_id"
+                value={currentSkill.skill_name_id || ''}
+                onChange={handleEditChange}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Skill Name (EN)"
+                name="skill_name_en"
+                value={currentSkill.skill_name_en || ''}
+                onChange={handleEditChange}
+                fullWidth
+                margin="normal"
+              />
+              <Typography gutterBottom sx={{ mt: 3 }}>Persentase Keahlian: {currentSkill.percentage}%</Typography>
               <Slider name="percentage" value={currentSkill.percentage} onChange={handleEditSliderChange} valueLabelDisplay="auto" />
             </Box>
           )}
@@ -151,4 +173,5 @@ const AdminSkillsPage = () => {
     </Container>
   );
 };
+
 export default AdminSkillsPage;

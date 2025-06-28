@@ -4,6 +4,9 @@ import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText
 import { Outlet, Link as RouterLink } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ArticleIcon from '@mui/icons-material/Article';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import SettingsIcon from '@mui/icons-material/Settings';
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 
 const drawerWidth = 240;
 
@@ -18,6 +21,9 @@ const AdminLayout = () => {
     { text: 'Portfolio', icon: <ArticleIcon />, path: '/admin/portfolio' },
     { text: 'Skills', icon: <ArticleIcon />, path: '/admin/skills' },
     { text: 'Contact Messages', icon: <ArticleIcon />, path: '/admin/contact-messages' },
+    { text: 'Articles', icon: <NewspaperIcon />, path: '/admin/articles' },
+    { text: 'Settings', icon: <SettingsIcon />, path: '/admin/settings' },
+    { text: 'Resume', icon: <WorkHistoryIcon />, path: '/admin/resume' },
     // Tambahkan menu lain sesuai kebutuhan
   ];
 

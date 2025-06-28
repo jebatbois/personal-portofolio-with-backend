@@ -1,0 +1,9 @@
+{
+  "nav_home": "Home",
+  "nav_articles": "Articles",
+  "nav_contact": "Contact",
+  "hero_greeting": "Hello, I'm {{name}}.",
+  "hero_bio": "A passionate developer ready to create amazing things.",
+  "skills_title": "Skills",
+  "resume_title": "Resume"
+}
