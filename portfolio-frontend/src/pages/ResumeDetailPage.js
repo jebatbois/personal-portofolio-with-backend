@@ -51,7 +51,9 @@ const ResumeDetailPage = () => {
         {/* Galeri Foto */}
         {images.length > 0 && (
           <Box>
-            <Typography variant="h4" gutterBottom>Galeri Foto</Typography>
+            <Typography variant="h4" gutterBottom>
+              {i18n.language === 'en' ? 'Photo Gallery' : 'Galeri Foto'}
+            </Typography>
             <Grid container spacing={2}>
               {images.map(image => (
                 <Grid item xs={6} sm={4} key={image.id}>

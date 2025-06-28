@@ -139,6 +139,16 @@ const AdminSettingsPage = () => {
             multiline 
             rows={3} 
           />
+          <TextField 
+            label="Short Bio (under your name)" 
+            name="bio_en" 
+            value={userInfo.bio_en || ''} 
+            onChange={handleChange} 
+            fullWidth 
+            margin="normal" 
+            multiline 
+            rows={3} 
+          />
 
           {/* Input Foto Profil */}
           <Typography variant="subtitle1" sx={{mt: 2}}>Foto Profil</Typography>

@@ -27,5 +27,6 @@
   "contact_error_message": "Gagal mengirim pesan. Coba lagi nanti.",
   "social_media_title": "Media Sosial",
   "service_title": "Harga / Servis",
-  "service_fallback": "Silakan hubungi untuk mendiskusikan detail servis dan biaya."
+  "service_fallback": "Silakan hubungi untuk mendiskusikan detail servis dan biaya.",
+  "gallery_photo": "Galeri Foto"
 }

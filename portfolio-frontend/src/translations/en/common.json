@@ -27,5 +27,6 @@
   "contact_error_message": "Failed to send the message. Please try again later.",
   "social_media_title": "Social Media",
   "service_title": "Value / Service",
-  "service_fallback": "Please get in touch to discuss service details and rates."
+  "service_fallback": "Please get in touch to discuss service details and rates.",
+  "gallery_photo": "Galeri Foto"
 }

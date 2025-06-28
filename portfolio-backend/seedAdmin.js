@@ -8,7 +8,7 @@ const seedDatabase = async () => {
     // Bagian 1: Membuat User Admin (tidak berubah)
     console.log("Memproses user admin...");
     const adminUsername = 'admin';
-    const adminPassword = 'password123';
+    const adminPassword = 'Rifqy123';
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(adminPassword, salt);
     await db.query('DELETE FROM admin_users WHERE username = ?', [adminUsername]);
