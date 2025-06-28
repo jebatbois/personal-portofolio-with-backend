@@ -4,11 +4,14 @@ const router = express.Router();
 const userinfoController = require('../controllers/userinfoController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Rute ini publik, siapa saja boleh melihat info dasar
+// Rute publik (tidak berubah)
 router.get('/', userinfoController.getUserInfo);
 
-// Rute ini private, hanya admin yang sudah login yang boleh meng-update
-// Ini adalah "jalan" yang kita butuhkan untuk menangani permintaan PUT dari frontend
+// --- TAMBAHKAN RUTE BARU INI ---
+// Rute private untuk mengambil semua data mentah ke admin panel
+router.get('/admin', protect, userinfoController.getUserInfoForAdmin);
+
+// Rute untuk update (tidak berubah)
 router.put('/:id', protect, userinfoController.updateUserInfo);
 
 module.exports = router;

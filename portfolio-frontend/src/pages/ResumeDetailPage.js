@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Typography, Box, Grid, Paper, CircularProgress } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../public-components/Navbar';
 import Footer from '../public-components/Footer';
 
@@ -10,6 +11,7 @@ const BACKEND_URL = 'http://localhost:5000';
 
 const ResumeDetailPage = () => {
   const { id } = useParams();
+  const { i18n } = useTranslation();
   const [item, setItem] = useState(null);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ const ResumeDetailPage = () => {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        const itemPromise = axios.get(`${BACKEND_URL}/api/resume/${id}`);
+        const itemPromise = axios.get(`${BACKEND_URL}/api/resume/${id}?lang=${i18n.language}`);
         const imagesPromise = axios.get(`${BACKEND_URL}/api/resume/${id}/images`);
         const [itemResponse, imagesResponse] = await Promise.all([itemPromise, imagesPromise]);
         setItem(itemResponse.data);
@@ -27,7 +29,7 @@ const ResumeDetailPage = () => {
       finally { setLoading(false); }
     };
     fetchDetails();
-  }, [id]);
+  }, [id, i18n.language]);
 
   if (loading) return <Box sx={{display: 'flex', justifyContent: 'center', my: 10}}><CircularProgress /></Box>;
   if (!item) return <Typography>Item tidak ditemukan.</Typography>;

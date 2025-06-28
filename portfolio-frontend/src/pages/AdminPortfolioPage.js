@@ -131,7 +131,32 @@ const AdminPortfolioPage = () => {
   };
   
   const handleDeleteGalleryImage = async (imageId) => {
-      // Logika untuk menghapus gambar dari galeri
+    const token = localStorage.getItem('authToken');
+    if (!window.confirm('Yakin ingin menghapus gambar ini?')) return;
+    try {
+      await axios.delete(`${BACKEND_URL}/api/portfolio/gallery/${imageId}`, {
+        headers: { Authorization: token }
+      });
+      // Hapus dari state agar UI langsung update
+      setExistingGallery(existingGallery.filter(img => img.id !== imageId));
+    } catch (error) {
+      alert('Gagal menghapus gambar galeri.');
+      console.error(error);
+    }
+  };
+
+  const handleDeletePortfolio = async (portfolioId) => {
+    const token = localStorage.getItem('authToken');
+    if (!window.confirm('Yakin ingin menghapus proyek ini?')) return;
+    try {
+      await axios.delete(`${BACKEND_URL}/api/portfolio/${portfolioId}`, {
+        headers: { Authorization: token }
+      });
+      setPortfolios(portfolios.filter(p => p.id !== portfolioId));
+    } catch (error) {
+      alert('Gagal menghapus proyek.');
+      console.error(error);
+    }
   };
 
   return (
@@ -150,11 +175,15 @@ const AdminPortfolioPage = () => {
             <TableBody>
               {portfolios.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell><img src={`${BACKEND_URL}${p.image_url}`} alt={p.project_name} style={{ width: '100px', height: 'auto' }} /></TableCell>
+                  <TableCell>
+                    <img src={`${BACKEND_URL}${p.image_url}`} alt={p.project_name} style={{ width: '100px', height: 'auto' }} />
+                  </TableCell>
                   <TableCell>{p.project_name}</TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleOpenEditDialog(p)}><EditIcon /></IconButton>
-                    <IconButton color="error"><DeleteIcon /></IconButton>
+                    <IconButton color="error" onClick={() => handleDeletePortfolio(p.id)}>
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}

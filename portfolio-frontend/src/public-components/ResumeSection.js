@@ -17,15 +17,13 @@ const BACKEND_URL = 'http://localhost:5000';
 
 const ResumeSection = () => {
   const [resumeItems, setResumeItems] = useState([]);
-  const { i18n } = useTranslation(); // Dapatkan instance i18n
+  const { t, i18n } = useTranslation('common');
 
   useEffect(() => {
     axios.get(`${BACKEND_URL}/api/resume?lang=${i18n.language}`)
-      .then(response => {
-        setResumeItems(response.data);
-      })
+      .then(response => setResumeItems(response.data))
       .catch(error => console.error("Error fetching resume data:", error));
-  }, [i18n.language]); // Jalankan ulang setiap kali bahasa berubah
+  }, [i18n.language]);
 
   const experiences = resumeItems.filter(item => item.item_type === 'experience');
   const educations = resumeItems.filter(item => item.item_type === 'education');
@@ -43,18 +41,17 @@ const ResumeSection = () => {
 
   const renderTimeline = (title, items) => (
     items.length > 0 && (
-      <Box sx={{ width: '100%'}}>
+      <Box sx={{ width: '100%' }}>
         <Typography variant="h4" sx={{ mt: 6, mb: 3, fontWeight: 'bold' }}>{title}</Typography>
-        <Timeline position="alternate"> 
+        <Timeline position="alternate">
           {items.map((item) => (
             <TimelineItem key={item.id}>
               <TimelineOppositeContent color="text.secondary" sx={{ m: 'auto 0' }}>
-                {new Date(item.start_date).getFullYear()} - {item.end_date ? new Date(item.end_date).getFullYear() : 'Sekarang'}
+                {new Date(item.start_date).getFullYear()} - {item.end_date ? new Date(item.end_date).getFullYear() : t('present_time', 'Sekarang')}
               </TimelineOppositeContent>
               <TimelineSeparator>
                 <TimelineConnector sx={{ bgcolor: 'primary.main' }} />
                 <TimelineDot color="primary">
-                  {/* Sekarang ikon akan muncul karena sudah di-import */}
                   {getIcon(item.item_type)}
                 </TimelineDot>
                 <TimelineConnector sx={{ bgcolor: 'primary.main' }} />
@@ -80,6 +77,11 @@ const ResumeSection = () => {
                 >
                   <Typography variant="h6" component="span">{item.title}</Typography>
                   <Typography>{item.subtitle}</Typography>
+                  {item.summary && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      {item.summary}
+                    </Typography>
+                  )}
                 </Box>
               </TimelineContent>
             </TimelineItem>
@@ -92,12 +94,12 @@ const ResumeSection = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h3" component="h2" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-        Resume
+        {t('resume_title', 'Resume')}
       </Typography>
-      {renderTimeline("Pengalaman Kerja", experiences)}
-      {renderTimeline("Pendidikan", educations)}
-      {renderTimeline("Organisasi", organizations)}
-      {renderTimeline("Aktivitas & Pencapaian", activities)}
+      {renderTimeline(t('experience_title', 'Pengalaman Kerja'), experiences)}
+      {renderTimeline(t('education_title', 'Pendidikan'), educations)}
+      {renderTimeline(t('organization_title', 'Organisasi'), organizations)}
+      {renderTimeline(t('activity_title', 'Aktivitas & Pencapaian'), activities)}
     </Container>
   );
 };

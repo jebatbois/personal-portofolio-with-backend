@@ -7,9 +7,9 @@ const BACKEND_URL = 'http://localhost:5000';
 const AdminSettingsPage = () => {
   // Semua state dideklarasikan di dalam komponen
   const [userInfo, setUserInfo] = useState({
-    id: null, full_name: '', job_title: '', bio: '', profile_picture_url: '', navbar_logo_url: '', 
+    id: null, full_name: '', bio_id: '', bio_en: '', profile_picture_url: '', navbar_logo_url: '', 
     email: '', phone_number: '', address: '', linkedin_url: '', github_url: '', 
-    instagram_url: '', service_description: ''
+    instagram_url: '', service_description_id: '', service_description_en: ''
   });
   const [selectedProfileFile, setSelectedProfileFile] = useState(null);
   const [selectedLogoFile, setSelectedLogoFile] = useState(null);
@@ -19,17 +19,18 @@ const AdminSettingsPage = () => {
   // Fetch data awal
   useEffect(() => {
     const fetchUserInfo = async () => {
+      const token = localStorage.getItem('authToken');
       try {
-        const response = await axios.get(`${BACKEND_URL}/api/userinfo`);
+        // --- UBAH URL DI SINI ---
+        const response = await axios.get(`${BACKEND_URL}/api/userinfo/admin`, {
+          headers: { Authorization: token }
+        });
+        // --- AKHIR PERUBAHAN ---
+
         const data = response.data;
-        const initialInfo = {};
-        // Inisialisasi semua field agar tidak 'undefined'
-        for (const key in userInfo) {
-            initialInfo[key] = data[key] || '';
-        }
-        setUserInfo(initialInfo);
+        setUserInfo(data);
       } catch (error) {
-        console.error("Gagal mengambil info user:", error);
+        console.error("Gagal mengambil info user untuk admin:", error);
       }
     };
     fetchUserInfo();
@@ -89,6 +90,10 @@ const AdminSettingsPage = () => {
         }
     }
 
+    // --- TAMBAHKAN LOG INI ---
+    console.log("DATA YANG AKAN DIKIRIM KE BACKEND (PUT):", updatedUserInfo);
+    // --- END LOG ---
+
     // Langkah 3: Simpan SEMUA data userInfo ke database
     try {
       await axios.put(`${BACKEND_URL}/api/userinfo/${updatedUserInfo.id}`, updatedUserInfo, {
@@ -97,8 +102,6 @@ const AdminSettingsPage = () => {
       setMessage('Data berhasil disimpan!');
       setSelectedProfileFile(null);
       setSelectedLogoFile(null);
-      // Optional: fetch ulang data untuk sinkronisasi
-      // fetchUserInfo(); 
     } catch (error) {
       setMessage('Gagal menyimpan data.');
       console.error(error);
@@ -114,10 +117,22 @@ const AdminSettingsPage = () => {
         <Box component="form" onSubmit={handleSubmit}>
           {/* ... Input teks lainnya ... */}
           <TextField label="Nama Lengkap" name="full_name" value={userInfo.full_name} onChange={handleChange} fullWidth margin="normal" />
+          
+          {/* Tambahkan form email di bawah ini */}
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={userInfo.email || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+          
           <TextField 
             label="Bio Singkat (di bawah nama Anda)" 
-            name="bio" 
-            value={userInfo.bio || ''} 
+            name="bio_id" 
+            value={userInfo.bio_id || ''} 
             onChange={handleChange} 
             fullWidth 
             margin="normal" 
@@ -148,10 +163,26 @@ const AdminSettingsPage = () => {
           <TextField label="URL GitHub" name="github_url" value={userInfo.github_url} onChange={handleChange} fullWidth margin="normal" />
           <TextField label="URL Instagram" name="instagram_url" value={userInfo.instagram_url} onChange={handleChange} fullWidth margin="normal" />
           <Typography variant="h6" sx={{ mt: 3 }}>Info Servis</Typography>
-          <TextField label="Deskripsi Servis / Fee" name="service_description" value={userInfo.service_description} onChange={handleChange} fullWidth margin="normal" multiline rows={4} />
-          <TextField label="Job Title (EN)" name="job_title_en" value={userInfo.job_title_en || ''} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Bio (EN)" name="bio_en" value={userInfo.bio_en || ''} onChange={handleChange} fullWidth margin="normal" multiline rows={3} />
-          <TextField label="Service Description (EN)" name="service_description_en" value={userInfo.service_description_en || ''} onChange={handleChange} fullWidth margin="normal" multiline rows={4} />
+          <TextField
+            label="Deskripsi Servis (ID)"
+            name="service_description_id"
+            value={userInfo.service_description_id || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+          />
+          <TextField
+            label="Service Description (EN)"
+            name="service_description_en"
+            value={userInfo.service_description_en || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+          />
           <Button type="submit" variant="contained" sx={{ mt: 3 }} disabled={isUploading}>
             {isUploading ? <CircularProgress size={24} /> : 'Simpan Pengaturan'}
           </Button>

@@ -13,9 +13,12 @@ import EditIcon from '@mui/icons-material/Edit';
 const BACKEND_URL = 'http://localhost:5000';
 
 const defaultForm = {
-  title: '',
-  summary: '',
-  content: '',
+  title_id: '',
+  title_en: '',
+  summary_id: '',
+  summary_en: '',
+  content_id: '',
+  content_en: '',
   thumbnail_url: '',
   status: 'draft'
 };
@@ -77,9 +80,12 @@ const AdminArticlesPage = () => {
   const handleOpenEditDialog = (article) => {
     setFormData({
       id: article.id,
-      title: article.title,
-      summary: article.summary || '',
-      content: article.content || '',
+      title_id: article.title_id || '',
+      title_en: article.title_en || '',
+      summary_id: article.summary_id || '',
+      summary_en: article.summary_en || '',
+      content_id: article.content_id || '',
+      content_en: article.content_en || '',
       thumbnail_url: article.thumbnail_url || '',
       status: article.status
     });
@@ -232,28 +238,63 @@ const AdminArticlesPage = () => {
         <DialogTitle>{isEditMode ? 'Edit Artikel' : 'Tambah Artikel Baru'}</DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={isEditMode ? handleUpdateSubmit : handleSubmit} sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Judul (ID)</Typography>
             <TextField
-              label="Judul"
-              name="title"
-              value={formData.title}
+              label="Judul (ID)"
+              name="title_id"
+              value={formData.title_id}
               onChange={handleChange}
               fullWidth
               margin="normal"
               required
             />
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Judul (EN)</Typography>
             <TextField
-              label="Summary"
-              name="summary"
-              value={formData.summary}
+              label="Title (EN)"
+              name="title_en"
+              value={formData.title_en}
               onChange={handleChange}
               fullWidth
               margin="normal"
               required
             />
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Summary (ID)</Typography>
             <TextField
-              label="Konten"
-              name="content"
-              value={formData.content}
+              label="Summary (ID)"
+              name="summary_id"
+              value={formData.summary_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Summary (EN)</Typography>
+            <TextField
+              label="Summary (EN)"
+              name="summary_en"
+              value={formData.summary_en}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Konten (ID)</Typography>
+            <TextField
+              label="Konten (ID)"
+              name="content_id"
+              value={formData.content_id}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              multiline
+              rows={6}
+              required
+            />
+            <Typography variant="subtitle2" sx={{ mt: 2 }}>Content (EN)</Typography>
+            <TextField
+              label="Content (EN)"
+              name="content_en"
+              value={formData.content_en}
               onChange={handleChange}
               fullWidth
               margin="normal"

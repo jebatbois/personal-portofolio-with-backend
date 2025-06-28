@@ -5,27 +5,30 @@ import axios from 'axios';
 import { Container, Typography, Box, CircularProgress, Alert } from '@mui/material';
 import Navbar from '../public-components/Navbar';
 import Footer from '../public-components/Footer';
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_URL = 'http://localhost:5000';
 
 const ArticleDetailPage = () => {
-  const { slug } = useParams(); // Ambil 'slug' dari URL
+  const { slug } = useParams();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { t, i18n } = useTranslation('common'); // gunakan namespace jika ada
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/articles/${slug}`)
+    if (!slug) return;
+    axios.get(`${BACKEND_URL}/api/articles/${slug}?lang=${i18n.language}`)
       .then(res => {
         setArticle(res.data);
-        setLoading(false);
       })
       .catch(err => {
         setError('Artikel tidak ditemukan.');
+      })
+      .finally(() => {
         setLoading(false);
-        console.error(err);
       });
-  }, [slug]); // Jalankan ulang jika slug berubah
+  }, [slug, i18n.language]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -39,7 +42,7 @@ const ArticleDetailPage = () => {
               {article.title}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-              Dipublikasikan pada: {new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {t('published_at', 'Dipublikasikan pada')}: {new Date(article.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
             </Typography>
             {article.thumbnail_url && (
               <Box 
@@ -49,7 +52,6 @@ const ArticleDetailPage = () => {
                 sx={{ width: '100%', height: 'auto', maxHeight: '450px', objectFit: 'cover', borderRadius: '8px', mb: 4 }}
               />
             )}
-            {/* Untuk menampilkan konten HTML dari editor teks */}
             <Box dangerouslySetInnerHTML={{ __html: article.content }} />
           </article>
         )}

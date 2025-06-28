@@ -3,26 +3,25 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, Grid, Card, CardMedia, CardContent, CardActions, Button, Box, CardActionArea } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-
-// --- TAMBAHKAN BARIS INI ---
 const BACKEND_URL = 'http://localhost:5000';
 
 const PortfolioSection = () => {
     const [projects, setProjects] = useState([]);
+    const { t, i18n } = useTranslation('common');
 
     useEffect(() => {
-        // Menggunakan BACKEND_URL agar konsisten
-        axios.get(`${BACKEND_URL}/api/portfolio`)
+        axios.get(`${BACKEND_URL}/api/portfolio?lang=${i18n.language}`)
             .then(res => setProjects(res.data))
             .catch(err => console.error("Error fetching portfolio:", err));
-    }, []);
+    }, [i18n.language]);
 
     return (
         <Box sx={{ bgcolor: 'grey.100', py: 10 }}>
             <Container maxWidth="lg">
                 <Typography variant="h3" component="h2" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-                    My Projects
+                    {t('portfolio_title')}
                 </Typography>
                 <Grid container spacing={4} sx={{ mt: 4 }}>
                     {projects.map((project) => (
@@ -74,7 +73,7 @@ const PortfolioSection = () => {
                                     target="_blank"
                                     color="primary"
                                   >
-                                    Lihat Proyek
+                                    {t('view_project_button')}
                                   </Button>
                                 </CardActions>
                               )}

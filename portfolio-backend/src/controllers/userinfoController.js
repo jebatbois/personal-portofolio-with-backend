@@ -3,64 +3,64 @@ const db = require('../config/db');
 
 exports.getUserInfo = async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM userinfo LIMIT 1');
-    if (rows.length === 0) {
-      // Ini penting jika tabelnya benar-benar kosong di awal
-      return res.status(404).json({ message: 'User info tidak ditemukan.' });
-    }
+    const lang = req.query.lang === 'en' ? 'en' : 'id';
+    const bioCol = `bio_${lang} as bio`;
+    const serviceDescCol = `service_description_${lang} as service_description`;
+
+    // Query SELECT tanpa job_title
+    const sql = `SELECT id, full_name, ${bioCol}, profile_picture_url, navbar_logo_url, email, phone_number, address, linkedin_url, github_url, instagram_url, ${serviceDescCol} FROM userinfo LIMIT 1`;
+
+    const [rows] = await db.query(sql);
+    if (rows.length === 0) return res.status(404).json({ message: 'User info tidak ditemukan.' });
     res.status(200).json(rows[0]);
+  } catch (error) { res.status(500).json({ message: 'Server Error', error }); }
+};
+
+exports.updateUserInfo = async (req, res) => {
+  // --- TAMBAHKAN CONSOLE.LOG DI SINI ---
+  console.log("=== BACKEND MENERIMA PERMINTAAN UPDATE ===");
+  console.log("ID DARI URL:", req.params.id);
+  console.log("DATA DARI BODY:", req.body);
+  // --- AKHIR TAMBAHAN ---
+
+  const { id } = req.params;
+  const { 
+    full_name, bio_id, bio_en, profile_picture_url, navbar_logo_url, email, 
+    phone_number, address, linkedin_url, github_url, instagram_url, 
+    service_description_id, service_description_en
+  } = req.body;
+
+  try {
+    // Query UPDATE tanpa job_title
+    const sql = `UPDATE userinfo SET 
+      full_name = ?, bio_id = ?, bio_en = ?, profile_picture_url = ?, navbar_logo_url = ?, 
+      email = ?, phone_number = ?, address = ?, linkedin_url = ?, github_url = ?, 
+      instagram_url = ?, service_description_id = ?, service_description_en = ?
+      WHERE id = ?`;
+    const values = [
+      full_name, bio_id, bio_en, profile_picture_url, navbar_logo_url, email, phone_number,
+      address, linkedin_url, github_url, instagram_url, service_description_id, service_description_en, id
+    ];
+
+    await db.query(sql, values);
+    res.status(200).json({ message: 'User info berhasil diupdate' });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }
 };
 
-// --- FUNGSI INI YANG KITA PERBAIKI SECARA FINAL ---
-exports.updateUserInfo = async (req, res) => {
-  const { id } = req.params;
-  
-  // Ambil semua data dari body request, TERMASUK navbar_logo_url
-  const { 
-    full_name, 
-    job_title, 
-    job_title_en, // <-- Tambahkan ini
-    bio, 
-    bio_en, // <-- Tambahkan ini
-    profile_picture_url, 
-    navbar_logo_url, // <-- Pastikan ini ada
-    email, 
-    phone_number, 
-    address,
-    linkedin_url,
-    github_url,
-    instagram_url,
-    service_description,
-    service_description_en // <-- Tambahkan ini
-  } = req.body;
-
+// @desc    Ambil SEMUA data user info untuk admin panel
+// @route   GET /api/userinfo/admin
+// @access  Private
+exports.getUserInfoForAdmin = async (req, res) => {
   try {
-    // Pastikan query SQL juga meng-update kolom navbar_logo_url
-    const sql = `UPDATE userinfo SET 
-      full_name = ?, job_title = ?, job_title_en = ?, bio = ?, bio_en = ?, 
-      profile_picture_url = ?, navbar_logo_url = ?, -- <-- Pastikan ini ada
-      email = ?, phone_number = ?, address = ?, 
-      linkedin_url = ?, github_url = ?, instagram_url = ?, 
-      service_description = ?, service_description_en = ? -- <-- Pastikan ini ada
-      WHERE id = ?`;
-
-    // Pastikan variabelnya juga dimasukkan ke dalam array values
-    const values = [
-      full_name, job_title, job_title_en, bio, bio_en, 
-      profile_picture_url, navbar_logo_url, // <-- Pastikan ini ada
-      email, phone_number, address,
-      linkedin_url, github_url, instagram_url, 
-      service_description, service_description_en, // <-- Pastikan ini ada
-      id
-    ];
-    
-    await db.query(sql, values);
-    res.status(200).json({ message: 'User info berhasil diupdate' });
+    // Cukup ambil semua kolom dari baris pertama
+    const [rows] = await db.query('SELECT * FROM userinfo LIMIT 1');
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User info tidak ditemukan.' });
+    }
+    res.status(200).json(rows[0]);
   } catch (error) {
-    console.error("ERROR saat update user info:", error);
     res.status(500).json({ message: 'Server Error', error });
   }
 };

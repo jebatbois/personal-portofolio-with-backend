@@ -3,19 +3,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, Box } from '@mui/material';
 import ArrowIcon from './icons/ArrowIcon';
-import { useTranslation } from 'react-i18next'; // 1. Import hook useTranslation
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_URL = 'http://localhost:5000';
 
 const HeroSection = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const { t } = useTranslation('common'); // 2. Panggil hook
+  const { t, i18n } = useTranslation('common');
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/api/userinfo`)
+    // API ini sudah cerdas, ia akan mengirim 'bio' yang sudah diterjemahkan
+    axios.get(`${BACKEND_URL}/api/userinfo?lang=${i18n.language}`)
       .then(res => setUserInfo(res.data))
       .catch(err => console.error("Error fetching user info:", err));
-  }, []);
+  }, [i18n.language]); // useEffect akan berjalan lagi setiap kali bahasa berubah
 
   if (!userInfo) {
     return <Box sx={{ minHeight: 'calc(100vh - 64px)', bgcolor: 'primary.main' }} />;
@@ -49,17 +50,17 @@ const HeroSection = () => {
               <ArrowIcon />
             </Box>
 
-            {/* --- PERBAIKAN UTAMA ADA DI SINI --- */}
             <Typography variant="h2" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
-              {/* 3. Gunakan t() dengan variabel */}
+              {/* Menggunakan variabel dari terjemahan */}
               {t('hero_greeting', { name: userInfo.full_name })}
             </Typography>
+
+            {/* --- PERBAIKAN FINAL ADA DI SINI --- */}
             <Typography variant="h5" sx={{ opacity: 0.9 }}>
-              {/* 4. Gunakan t() untuk bio */}
+              {/* Cukup tampilkan userInfo.bio, atau fallback ke terjemahan statis */}
               {userInfo.bio || t('hero_bio')}
             </Typography>
-            {/* --- AKHIR PERBAIKAN --- */}
-
+            
           </Box>
           
           {/* KOLOM KANAN (FOTO) */}
@@ -69,14 +70,7 @@ const HeroSection = () => {
                 component="img"
                 src={`${BACKEND_URL}${userInfo.profile_picture_url}`}
                 alt={userInfo.full_name}
-                sx={{
-                  width: '100%',
-                  maxWidth: { xs: '280px', md: '450px' },
-                  maxHeight: '500px',
-                  height: 'auto',
-                  borderRadius: '12px',
-                  objectFit: 'cover',
-                }}
+                sx={{ width: '100%', maxWidth: { xs: '280px', md: '450px' }, maxHeight: '500px', height: 'auto', borderRadius: '12px', objectFit: 'cover' }}
               />
             )}
           </Box>

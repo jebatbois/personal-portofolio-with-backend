@@ -13,9 +13,10 @@ exports.getAllResumeItems = async (req, res) => {
     const lang = req.query.lang === 'en' ? 'en' : 'id';
     const titleCol = `title_${lang}`;
     const subtitleCol = `subtitle_${lang}`;
+    const summaryCol = `summary_${lang}`;
     const descCol = `description_${lang}`;
 
-    const sql = `SELECT id, item_type, ${titleCol} as title, ${subtitleCol} as subtitle, start_date, end_date, ${descCol} as description FROM resume ORDER BY end_date DESC, start_date DESC`;
+    const sql = `SELECT id, item_type, ${titleCol} as title, ${subtitleCol} as subtitle, ${summaryCol} as summary, start_date, end_date, ${descCol} as description FROM resume ORDER BY end_date DESC, start_date DESC`;
     
     const [rows] = await db.query(sql);
     res.status(200).json(rows);
@@ -26,14 +27,18 @@ exports.getAllResumeItems = async (req, res) => {
 
 // Mengambil satu item dengan semua kolom bahasanya untuk form edit
 exports.getResumeItemById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const [rows] = await db.query('SELECT * FROM resume WHERE id = ?', [id]);
-        if (rows.length === 0) return res.status(404).json({ message: 'Item tidak ditemukan' });
-        res.status(200).json(rows[0]);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error', error });
-    }
+  const { id } = req.params;
+  const lang = req.query.lang === 'en' ? 'en' : 'id';
+  const descCol = `description_${lang}`;
+  try {
+    const [rows] = await db.query(
+      `SELECT *, ${descCol} as description FROM resume WHERE id = ?`, [id]
+    );
+    if (rows.length === 0) return res.status(404).json({ message: 'Item tidak ditemukan' });
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
 };
 
 // Membuat item baru dengan kolom summary multi-bahasa
