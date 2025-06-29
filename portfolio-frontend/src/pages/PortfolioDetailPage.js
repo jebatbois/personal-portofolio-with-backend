@@ -97,16 +97,49 @@ const PortfolioDetailPage = () => {
        {images.length > 0 && (
         <Box sx={{ mt: 5 }}>
           <Typography variant="h4" gutterBottom>Galeri Proyek</Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {images.map(image => (
-              <Grid item xs={6} sm={4} md={3} key={image.id}>
-                <Paper elevation={3}>
+              <Grid item xs={12} sm={6} md={4} key={image.id}>
+                <Paper
+                  elevation={4}
+                  sx={{
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    p: 0,
+                    height: 370,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+                  }}
+                >
                   <Box
-                    component="img"
-                    src={`${BACKEND_URL}${image.image_url}`}
-                    alt="Detail proyek"
-                    sx={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }}
-                  />
+                    sx={{
+                      width: '100%',
+                      height: 240,
+                      overflow: 'hidden',
+                      bgcolor: '#f5f5f5',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <img
+                      src={`${BACKEND_URL}${image.image_url}`}
+                      alt="Detail proyek"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                  </Box>
+                  {/* Jika ingin menambah caption atau info gambar */}
+                  {/* <Box sx={{ p: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {image.caption || ''}
+                    </Typography>
+                  </Box> */}
                 </Paper>
               </Grid>
             ))}

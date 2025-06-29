@@ -56,8 +56,31 @@ const ResumeDetailPage = () => {
             </Typography>
             <Grid container spacing={2}>
               {images.map(image => (
-                <Grid item xs={6} sm={4} key={image.id}>
-                    <img src={`${BACKEND_URL}${image.image_url}`} alt="Detail riwayat" style={{ width: '100%', borderRadius: '8px' }} />
+                <Grid item xs={12} sm={6} md={4} key={image.id}>
+                  <Box
+                    sx={{
+                      width: '100%',
+                      aspectRatio: '4/3', // Rasio galeri modern
+                      overflow: 'hidden',
+                      borderRadius: 2,
+                      boxShadow: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: '#f5f5f5',
+                    }}
+                  >
+                    <img
+                      src={`${BACKEND_URL}${image.image_url}`}
+                      alt="Detail riwayat"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                  </Box>
                 </Grid>
               ))}
             </Grid>
