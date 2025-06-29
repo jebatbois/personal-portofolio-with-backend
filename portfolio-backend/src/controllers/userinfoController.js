@@ -12,7 +12,7 @@ const formatDateForSQL = (dateString) => {
   return String(dateString).substring(0, 10);
 };
 
-// Mengambil data user info (tidak ada perubahan di sini)
+// Mengambil data user info (tambahkan spotify_url)
 exports.getUserInfo = async (req, res) => {
   try {
     const lang = req.query.lang === 'en' ? 'en' : 'id';
@@ -21,7 +21,7 @@ exports.getUserInfo = async (req, res) => {
     const hobbiesCol = `hobbies_${lang} as hobbies`;
     const serviceDescCol = `service_description_${lang} as service_description`;
 
-    const sql = `SELECT id, full_name, ${heroBioCol}, ${aboutDescCol}, profile_picture_url, about_image_url, navbar_logo_url, email, phone_number, address, place_of_birth, date_of_birth, location, ${hobbiesCol}, ${serviceDescCol}, linkedin_url, github_url, instagram_url FROM userinfo LIMIT 1`;
+    const sql = `SELECT id, full_name, ${heroBioCol}, ${aboutDescCol}, profile_picture_url, about_image_url, navbar_logo_url, email, phone_number, address, place_of_birth, date_of_birth, location, ${hobbiesCol}, ${serviceDescCol}, linkedin_url, github_url, instagram_url, spotify_url FROM userinfo LIMIT 1`;
     
     const [rows] = await db.query(sql);
     if (rows.length === 0) return res.status(404).json({ message: 'User info tidak ditemukan.' });
@@ -29,14 +29,14 @@ exports.getUserInfo = async (req, res) => {
   } catch (error) { res.status(500).json({ message: 'Server Error', error }); }
 };
 
-// Mengupdate semua data user info dengan format tanggal yang sudah aman
+// Mengupdate semua data user info dengan format tanggal yang sudah aman (tambahkan spotify_url)
 exports.updateUserInfo = async (req, res) => {
   const { id } = req.params;
   const { 
     full_name, hero_bio_id, hero_bio_en, about_description_id, about_description_en,
     profile_picture_url, navbar_logo_url, about_image_url,
     email, phone_number, address, place_of_birth, location,
-    linkedin_url, github_url, instagram_url,
+    linkedin_url, github_url, instagram_url, spotify_url,
     service_description_id, service_description_en,
     hobbies_id, hobbies_en
   } = req.body;
@@ -50,7 +50,7 @@ exports.updateUserInfo = async (req, res) => {
       about_description_id = ?, about_description_en = ?,
       profile_picture_url = ?, navbar_logo_url = ?, about_image_url = ?,
       email = ?, phone_number = ?, address = ?, place_of_birth = ?, date_of_birth = ?, location = ?,
-      linkedin_url = ?, github_url = ?, instagram_url = ?,
+      linkedin_url = ?, github_url = ?, instagram_url = ?, spotify_url = ?,
       service_description_id = ?, service_description_en = ?,
       hobbies_id = ?, hobbies_en = ?
       WHERE id = ?`;
@@ -60,7 +60,7 @@ exports.updateUserInfo = async (req, res) => {
       about_description_id, about_description_en,
       profile_picture_url, navbar_logo_url, about_image_url,
       email, phone_number, address, place_of_birth, dateOfBirthFormatted, location,
-      linkedin_url, github_url, instagram_url,
+      linkedin_url, github_url, instagram_url, spotify_url,
       service_description_id, service_description_en,
       hobbies_id, hobbies_en,
       id

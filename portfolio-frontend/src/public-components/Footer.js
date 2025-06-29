@@ -4,6 +4,7 @@ import { Box, Container, Typography, IconButton, Stack } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import { FaSpotify } from 'react-icons/fa'; // 3. Import Spotify icon
 import axios from 'axios';
 import { useTranslation } from 'react-i18next'; // 1. Import hook
 
@@ -61,6 +62,19 @@ const Footer = () => {
             aria-label="Instagram"
           >
             <InstagramIcon fontSize="large" />
+          </IconButton>
+          <IconButton
+            component="a"
+            href={userInfo.spotify_url || '#'}
+            target="_blank"
+            rel="noopener"
+            sx={{
+              color: 'white',
+              '&:hover': { color: '#1DB954', bgcolor: 'rgba(255,255,255,0.08)' }
+            }}
+            aria-label="Spotify"
+          >
+            <FaSpotify fontSize="Large" />
           </IconButton>
         </Stack>
         {/* --- PERBAIKAN ADA DI SINI --- */}

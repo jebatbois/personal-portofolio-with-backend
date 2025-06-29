@@ -7,6 +7,7 @@ import Footer from '../public-components/Footer';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import { FaSpotify } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
 const BACKEND_URL = 'http://localhost:5000';
@@ -21,7 +22,10 @@ const ContactPage = () => {
   useEffect(() => {
     // Ambil data userinfo sesuai bahasa
     axios.get(`${BACKEND_URL}/api/userinfo?lang=${i18n.language}`)
-      .then(res => setUserInfo(res.data))
+      .then(res => {
+        setUserInfo(res.data);
+        console.log('userInfo:', res.data); // CEK APAKAH ADA spotify_url
+      })
       .catch(err => console.error("Gagal mengambil info user:", err));
   }, [i18n.language]);
 
@@ -124,6 +128,23 @@ const ContactPage = () => {
                     }
                   }}>
                     <InstagramIcon fontSize="large" />
+                  </IconButton>
+                  <IconButton
+                    component="a"
+                    href={userInfo.spotify_url || '#'}
+                    target="_blank"
+                    rel="noopener"
+                    sx={{
+                      color: '#1DB954', // Hijau Spotify
+                      transition: 'color 0.2s, background 0.2s',
+                      '&:hover': {
+                        color: '#fff',
+                        backgroundColor: '#1DB954', // Warna hover Spotify
+                      }
+                    }}
+                    aria-label="Spotify"
+                  >
+                    <FaSpotify size={35} />
                   </IconButton>
                 </Box>
                 {/* Tambahkan email di bawah social media */}

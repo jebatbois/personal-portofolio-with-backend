@@ -299,6 +299,7 @@ const AdminSettingsPage = () => {
           <TextField label="URL LinkedIn" name="linkedin_url" value={userInfo.linkedin_url} onChange={handleChange} fullWidth margin="normal" />
           <TextField label="URL GitHub" name="github_url" value={userInfo.github_url} onChange={handleChange} fullWidth margin="normal" />
           <TextField label="URL Instagram" name="instagram_url" value={userInfo.instagram_url} onChange={handleChange} fullWidth margin="normal" />
+          <TextField label="URL Spotify" name="spotify_url" value={userInfo.spotify_url || ''} onChange={handleChange} fullWidth margin="normal" />
           <Typography variant="h6" sx={{ mt: 3 }}>Info Servis</Typography>
           <TextField
             label="Deskripsi Servis (ID)"
