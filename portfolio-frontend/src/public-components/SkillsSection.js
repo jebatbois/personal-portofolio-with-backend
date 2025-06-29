@@ -12,9 +12,9 @@ import {
   DiHtml5, 
   DiCss3,
   DiMysql,
-  DiPython
+  DiPython,
 } from 'react-icons/di';
-import { SiFigma, SiCplusplus, SiLaravel } from "react-icons/si";
+import { SiFigma, SiCplusplus, SiLaravel, SiKotlin, SiSmartthings } from "react-icons/si";
 
 // Fungsi "peta" untuk memilih ikon berdasarkan nama skill
 const getSkillIcon = (skillName) => {
@@ -29,6 +29,8 @@ const getSkillIcon = (skillName) => {
   if (lowerCaseName.includes('figma')) return <SiFigma size="2.5em" color="#F24E1E" />;
   if (lowerCaseName.includes('c++')) return <SiCplusplus size="2.5em" color="#00599C" />;
   if (lowerCaseName.includes('laravel')) return <SiLaravel size="2.5em" color="#FF2D20" />;
+  if (lowerCaseName.includes('kotlin')) return <SiKotlin size="2.5em" color="#0095D5" />;
+  if (lowerCaseName.includes('IoT')) return <SiSmartthings size="2.5em" color="#00A0DC" />;
 
   return null; 
 };

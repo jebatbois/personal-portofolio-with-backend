@@ -61,7 +61,26 @@ const AdminSkillsPage = () => {
     }
   };
 
-  const handleOpenEditDialog = (skill) => { setCurrentSkill({ ...skill }); setIsEditDialogOpen(true); };
+  const handleOpenEditDialog = async (skill) => {
+    setIsEditDialogOpen(true);
+    setCurrentSkill(null); // Reset dulu
+    const token = localStorage.getItem('authToken');
+    try {
+      // Ambil data lengkap dari backend (rute admin)
+      const res = await axios.get(`http://localhost:5000/api/skills/admin/${skill.id}`, {
+        headers: { Authorization: token }
+      });
+      setCurrentSkill({
+        id: res.data.id,
+        skill_name_id: res.data.skill_name_id || '',
+        skill_name_en: res.data.skill_name_en || '',
+        percentage: res.data.percentage || 0
+      });
+    } catch (error) {
+      alert('Gagal mengambil data skill.');
+      setCurrentSkill({ ...skill }); // fallback dari list
+    }
+  };
   const handleCloseEditDialog = () => setIsEditDialogOpen(false);
   const handleEditChange = (e) => setCurrentSkill({ ...currentSkill, [e.target.name]: e.target.value });
   const handleEditSliderChange = (e, newValue) => setCurrentSkill({ ...currentSkill, percentage: newValue });
@@ -175,3 +194,4 @@ const AdminSkillsPage = () => {
 };
 
 export default AdminSkillsPage;
+

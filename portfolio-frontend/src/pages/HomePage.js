@@ -6,6 +6,7 @@ import SkillsSection from '../public-components/SkillsSection';
 import ResumeSection from '../public-components/ResumeSection';
 import PortfolioSection from '../public-components/PortfolioSection';
 import Footer from '../public-components/Footer';
+import AboutSection from '../public-components/AboutSection';
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
       <main>
         {/* Pastikan setiap komponen hanya dipanggil satu kali */}
         <HeroSection />
+        <AboutSection />
         <SkillsSection />
         <ResumeSection />
         <PortfolioSection />

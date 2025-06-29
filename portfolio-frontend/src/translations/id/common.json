@@ -28,5 +28,9 @@
   "social_media_title": "Media Sosial",
   "service_title": "Harga / Servis",
   "service_fallback": "Silakan hubungi untuk mendiskusikan detail servis dan biaya.",
-  "gallery_photo": "Galeri Foto"
+  "gallery_photo": "Galeri Foto",
+  "about_me_title": "Tentang Saya",
+  "dob_label": "Tanggal Lahir",
+  "location_label": "Lokasi",
+  "hobbies_label": "Hobi"
 }

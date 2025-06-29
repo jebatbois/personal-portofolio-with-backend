@@ -57,8 +57,7 @@ const HeroSection = () => {
 
             {/* --- PERBAIKAN FINAL ADA DI SINI --- */}
             <Typography variant="h5" sx={{ opacity: 0.9 }}>
-              {/* Cukup tampilkan userInfo.bio, atau fallback ke terjemahan statis */}
-              {userInfo.bio || t('hero_bio')}
+              {userInfo.hero_bio || t('hero_bio')}
             </Typography>
             
           </Box>

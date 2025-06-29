@@ -28,5 +28,9 @@
   "social_media_title": "Social Media",
   "service_title": "Value / Service",
   "service_fallback": "Please get in touch to discuss service details and rates.",
-  "gallery_photo": "Galeri Foto"
+  "gallery_photo": "Galeri Foto",
+  "about_me_title": "About Me",
+  "dob_label": "Date of Birth",
+  "location_label": "Location",
+  "hobbies_label": "Hobbies"
 }

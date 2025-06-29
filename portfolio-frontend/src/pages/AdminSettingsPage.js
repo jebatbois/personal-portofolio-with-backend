@@ -7,12 +7,35 @@ const BACKEND_URL = 'http://localhost:5000';
 const AdminSettingsPage = () => {
   // Semua state dideklarasikan di dalam komponen
   const [userInfo, setUserInfo] = useState({
-    id: null, full_name: '', bio_id: '', bio_en: '', profile_picture_url: '', navbar_logo_url: '', 
-    email: '', phone_number: '', address: '', linkedin_url: '', github_url: '', 
-    instagram_url: '', service_description_id: '', service_description_en: ''
+    id: null,
+    full_name: '',
+    bio_id: '',
+    bio_en: '',
+    profile_picture_url: '',
+    navbar_logo_url: '',
+    email: '',
+    phone_number: '',
+    address: '',
+    linkedin_url: '',
+    github_url: '',
+    instagram_url: '',
+    service_description_id: '',
+    service_description_en: '',
+    // Tambahan field baru:
+    place_of_birth: '',
+    date_of_birth: '',
+    location: '',
+    hobbies_id: '',
+    hobbies_en: '',
+    hero_bio_id: '',
+    hero_bio_en: '',
+    about_description_id: '',
+    about_description_en: '',
+    about_image_url: ''
   });
   const [selectedProfileFile, setSelectedProfileFile] = useState(null);
   const [selectedLogoFile, setSelectedLogoFile] = useState(null);
+  const [aboutImageFile, setAboutImageFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -47,6 +70,9 @@ const AdminSettingsPage = () => {
   };
   const handleLogoFileChange = (e) => {
     setSelectedLogoFile(e.target.files[0]);
+  };
+  const handleAboutFileChange = (e) => {
+    setAboutImageFile(e.target.files[0]);
   };
 
   // --- SATU FUNGSI HANDLE SUBMIT UNTUK SEMUANYA ---
@@ -90,11 +116,27 @@ const AdminSettingsPage = () => {
         }
     }
 
+    // Langkah 3: Upload GAMBAR TENTANG SAYA jika ada file baru
+    if (aboutImageFile) {
+      const aboutFormData = new FormData();
+      aboutFormData.append('image', aboutImageFile);
+      try {
+        const uploadRes = await axios.post(`${BACKEND_URL}/api/upload`, aboutFormData, {
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: token },
+        });
+        updatedUserInfo.about_image_url = uploadRes.data.filePath;
+      } catch (error) {
+        setMessage('Gagal upload gambar tentang saya.');
+        setIsUploading(false);
+        return;
+      }
+    }
+
     // --- TAMBAHKAN LOG INI ---
     console.log("DATA YANG AKAN DIKIRIM KE BACKEND (PUT):", updatedUserInfo);
     // --- END LOG ---
 
-    // Langkah 3: Simpan SEMUA data userInfo ke database
+    // Langkah 4: Simpan SEMUA data userInfo ke database
     try {
       await axios.put(`${BACKEND_URL}/api/userinfo/${updatedUserInfo.id}`, updatedUserInfo, {
         headers: { Authorization: token }
@@ -102,6 +144,7 @@ const AdminSettingsPage = () => {
       setMessage('Data berhasil disimpan!');
       setSelectedProfileFile(null);
       setSelectedLogoFile(null);
+      setAboutImageFile(null);
     } catch (error) {
       setMessage('Gagal menyimpan data.');
       console.error(error);
@@ -115,39 +158,65 @@ const AdminSettingsPage = () => {
       <Typography variant="h4" gutterBottom>Pengaturan Umum & Kontak</Typography>
       <Paper elevation={3} sx={{ p: 3 }}>
         <Box component="form" onSubmit={handleSubmit}>
-          {/* ... Input teks lainnya ... */}
           <TextField label="Nama Lengkap" name="full_name" value={userInfo.full_name} onChange={handleChange} fullWidth margin="normal" />
-          
-          {/* Tambahkan form email di bawah ini */}
+
+          {/* Tambahkan field baru di sini */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="Tempat Lahir"
+              name="place_of_birth"
+              value={userInfo.place_of_birth || ''}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Tanggal Lahir"
+              name="date_of_birth"
+              type="date"
+              // --- PERBAIKAN LOGIKA VALUE DI SINI ---
+              value={
+                userInfo && userInfo.date_of_birth
+                  ? userInfo.date_of_birth.substring(0, 10)
+                  : ''
+              }
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
           <TextField
-            label="Email"
-            name="email"
-            type="email"
-            value={userInfo.email || ''}
+            label="Lokasi Saat Ini"
+            name="location"
+            value={userInfo.location || ''}
             onChange={handleChange}
             fullWidth
             margin="normal"
           />
-          
-          <TextField 
-            label="Bio Singkat (di bawah nama Anda)" 
-            name="bio_id" 
-            value={userInfo.bio_id || ''} 
-            onChange={handleChange} 
-            fullWidth 
-            margin="normal" 
-            multiline 
-            rows={3} 
+
+
+          {/* Input Hobi */}
+          <Typography variant="h6" sx={{ mt: 3 }}>Hobi</Typography>
+          <TextField
+            label="Hobi (ID)"
+            name="hobbies_id"
+            value={userInfo.hobbies_id || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={2}
           />
-          <TextField 
-            label="Short Bio (under your name)" 
-            name="bio_en" 
-            value={userInfo.bio_en || ''} 
-            onChange={handleChange} 
-            fullWidth 
-            margin="normal" 
-            multiline 
-            rows={3} 
+          <TextField
+            label="Hobbies (EN)"
+            name="hobbies_en"
+            value={userInfo.hobbies_en || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={2}
           />
 
           {/* Input Foto Profil */}
@@ -167,6 +236,64 @@ const AdminSettingsPage = () => {
             <input type="file" hidden onChange={handleLogoFileChange} accept="image/*" />
           </Button>
           {selectedLogoFile && <Typography variant="body2" sx={{mt:1, fontStyle: 'italic'}}>File dipilih: {selectedLogoFile.name}</Typography>}
+
+          {/* Tambahan field baru untuk Hero dan Tentang Saya */}
+          <TextField
+            label="Bio Singkat untuk Hero (ID)"
+            name="hero_bio_id"
+            value={userInfo.hero_bio_id || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={3}
+          />
+          <TextField
+            label="Short Bio for Hero (EN)"
+            name="hero_bio_en"
+            value={userInfo.hero_bio_en || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={3}
+          />
+
+          <Typography variant="h6" sx={{ mt: 3 }}>Section Tentang Saya</Typography>
+          <TextField
+            label="Deskripsi Panjang Tentang Saya (ID)"
+            name="about_description_id"
+            value={userInfo.about_description_id || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={6}
+          />
+          <TextField
+            label="Long Description About Me (EN)"
+            name="about_description_en"
+            value={userInfo.about_description_en || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={6}
+          />
+
+          <Typography variant="subtitle1" sx={{mt: 2}}>Gambar untuk Section "Tentang Saya"</Typography>
+          {userInfo.about_image_url && (
+            <img
+              src={`${BACKEND_URL}${userInfo.about_image_url}`}
+              alt="about preview"
+              style={{width: '150px', height: 'auto', display: 'block', marginBottom: '10px'}}
+            />
+          )}
+          <Button variant="contained" component="label">
+            Upload Gambar About
+            <input type="file" hidden onChange={handleAboutFileChange} accept="image/*" />
+          </Button>
+          {aboutImageFile && <Typography variant="body2" sx={{mt:1}}>{aboutImageFile.name}</Typography>}
 
           <Typography variant="h6" sx={{ mt: 3 }}>Sosial Media</Typography>
           <TextField label="URL LinkedIn" name="linkedin_url" value={userInfo.linkedin_url} onChange={handleChange} fullWidth margin="normal" />

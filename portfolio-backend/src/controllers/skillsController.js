@@ -54,3 +54,19 @@ exports.deleteSkill = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error });
   }
 };
+
+// @desc    Ambil satu skill lengkap dengan semua kolomnya untuk Admin
+// @route   GET /api/skills/admin/:id
+// @access  Private
+exports.getSkillByIdForAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query('SELECT id, skill_name_id, skill_name_en, percentage FROM skills WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Skill tidak ditemukan' });
+    }
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};

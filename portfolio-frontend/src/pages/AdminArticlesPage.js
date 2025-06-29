@@ -77,21 +77,47 @@ const AdminArticlesPage = () => {
     setIsDialogOpen(true);
   };
 
-  const handleOpenEditDialog = (article) => {
-    setFormData({
-      id: article.id,
-      title_id: article.title_id || '',
-      title_en: article.title_en || '',
-      summary_id: article.summary_id || '',
-      summary_en: article.summary_en || '',
-      content_id: article.content_id || '',
-      content_en: article.content_en || '',
-      thumbnail_url: article.thumbnail_url || '',
-      status: article.status
-    });
-    setThumbnailFile(null);
+  const handleOpenEditDialog = async (article) => {
+    resetAndClose();
     setIsEditMode(true);
-    setIsDialogOpen(true);
+    setIsSubmitting(true);
+    const token = localStorage.getItem('authToken');
+    try {
+      // Ambil data lengkap artikel dari endpoint admin (by id)
+      const res = await axios.get(`${BACKEND_URL}/api/articles/admin/${article.id}`, {
+        headers: { Authorization: token }
+      });
+      setFormData({
+        id: res.data.id,
+        title_id: res.data.title_id || '',
+        title_en: res.data.title_en || '',
+        summary_id: res.data.summary_id || '',
+        summary_en: res.data.summary_en || '',
+        content_id: res.data.content_id || '',
+        content_en: res.data.content_en || '',
+        thumbnail_url: res.data.thumbnail_url || '',
+        status: res.data.status
+      });
+      setThumbnailFile(null);
+    } catch (error) {
+      console.error("Gagal mengambil detail artikel untuk diedit:", error);
+      alert("Gagal mengambil data artikel.");
+      // fallback: isi dari props lama
+      setFormData({
+        id: article.id,
+        title_id: article.title_id || '',
+        title_en: article.title_en || '',
+        summary_id: article.summary_id || '',
+        summary_en: article.summary_en || '',
+        content_id: article.content_id || '',
+        content_en: article.content_en || '',
+        thumbnail_url: article.thumbnail_url || '',
+        status: article.status
+      });
+    } finally {
+      setIsSubmitting(false);
+      setIsDialogOpen(true);
+    }
   };
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
