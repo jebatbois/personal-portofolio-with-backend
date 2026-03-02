@@ -35,3 +35,6 @@ app.use('/api/upload', uploadRoutes);
 app.listen(port, () => {
   console.log(`🚀 Server backend berjalan di http://localhost:${port}`);
 });
+
+// TAMBAHKAN BARIS INI UNTUK VERCEL
+module.exports = app;
