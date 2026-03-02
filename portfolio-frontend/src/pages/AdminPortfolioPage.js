@@ -192,7 +192,7 @@ const AdminPortfolioPage = () => {
               {portfolios.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
-                    <img src={`${BACKEND_URL}${p.image_url}`} alt={p.project_name} style={{ width: '100px', height: 'auto' }} />
+                    <img src={p.image_url?.startsWith('http') ? p.image_url : `${BACKEND_URL}${p.image_url}`} alt={p.project_name} style={{ width: '100px', height: 'auto' }} />
                   </TableCell>
                   <TableCell>{p.project_name}</TableCell>
                   <TableCell>
@@ -315,7 +315,7 @@ const AdminPortfolioPage = () => {
                   {existingGallery.map(img => (
                     <Grid item key={img.id}>
                       <Paper sx={{ p: 0.5, position: 'relative' }}>
-                        <img src={`${BACKEND_URL}${img.image_url}`} alt="galeri" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                        <img src={img.image_url?.startsWith('http') ? img.image_url : `${BACKEND_URL}${img.image_url}`} alt="galeri" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
                         <IconButton size="small" sx={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,255,255,0.7)' }} onClick={() => handleDeleteGalleryImage(img.id)}><CloseIcon fontSize="small"/></IconButton>
                       </Paper>
                     </Grid>

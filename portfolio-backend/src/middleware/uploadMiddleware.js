@@ -1,16 +1,24 @@
-// src/middleware/uploadMiddleware.js
 const multer = require('multer');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'public/uploads'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+// Konfigurasi Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Ubah batas file sesuai kebutuhan (contoh: 5MB)
-const upload = multer({
-  storage,
-  limits: { fileSize: 8 * 1024 * 1024 } // 5MB
+// Setup penyimpanan ke folder 'portfolio_uploads' di dalam Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'portfolio_uploads',
+    allowedFormats: ['jpg', 'png', 'jpeg', 'webp', 'svg'],
+  },
 });
+
+const upload = multer({ storage: storage });
 
 module.exports = upload;

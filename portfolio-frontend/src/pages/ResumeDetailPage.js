@@ -164,7 +164,7 @@ const ResumeDetailPage = () => {
                       }}
                     >
                       <img
-                        src={`${BACKEND_URL}${image.image_url}`}
+                        src={image.image_url.startsWith('http') ? image.image_url : `${BACKEND_URL}${image.image_url}`}
                         alt="Evidence"
                         style={{
                           width: '100%',

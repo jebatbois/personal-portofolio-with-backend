@@ -72,10 +72,12 @@ const PortfolioSection = () => {
           }
         }}>
           {portfolios.map(project => {
-            // Logika untuk mengambil gambar (menyesuaikan struktur DB kamu)
-            const coverImage = project.images && project.images.length > 0 
-              ? `${BACKEND_URL}${project.images[0].image_url}` 
-              : (project.image_url ? `${BACKEND_URL}${project.image_url}` : 'https://via.placeholder.com/600x400/1125d6/ffed00?text=NO+IMAGE');
+            // Logika Gambar (Sudah mendukung URL Cloudinary maupun lokal)
+            const coverImage = project.image_url 
+              ? (project.image_url.startsWith('http') ? project.image_url : `${BACKEND_URL}${project.image_url}`)
+              : (project.images && project.images.length > 0
+                ? (project.images[0].image_url.startsWith('http') ? project.images[0].image_url : `${BACKEND_URL}${project.images[0].image_url}`)
+                : 'https://via.placeholder.com/600x400/1125d6/ffed00?text=NO+IMAGE');
 
             return (
               <Box key={project.id} sx={{

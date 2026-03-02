@@ -54,7 +54,7 @@ const AboutSection = () => {
                 }} />
                 <Box 
                   component="img" 
-                  src={`${BACKEND_URL}${userInfo.about_image_url}`} 
+                  src={userInfo.about_image_url?.startsWith('http') ? userInfo.about_image_url : `${BACKEND_URL}${userInfo.about_image_url}`}
                   alt="About Me"
                   sx={{
                     width: '100%',

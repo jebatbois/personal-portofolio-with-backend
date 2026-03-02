@@ -232,7 +232,7 @@ const AdminSettingsPage = () => {
 
           {/* Input Foto Profil */}
           <Typography variant="subtitle1" sx={{mt: 2}}>Foto Profil</Typography>
-          {userInfo.profile_picture_url && <img src={`${BACKEND_URL}${userInfo.profile_picture_url}`} alt="preview" style={{width: '100px', height: '100px', objectFit: 'cover', display: 'block', marginBottom: '10px', borderRadius: '4px'}} />}
+          {userInfo.profile_picture_url && <img src={userInfo.profile_picture_url.startsWith('http') ? userInfo.profile_picture_url : `${BACKEND_URL}${userInfo.profile_picture_url}`} alt="preview" style={{width: '100px', height: '100px', objectFit: 'cover', display: 'block', marginBottom: '10px', borderRadius: '4px'}} />}
           <Button variant="contained" component="label">
             Upload Foto Profil Baru
             <input type="file" hidden onChange={handleProfileFileChange} accept="image/*" />
@@ -241,7 +241,7 @@ const AdminSettingsPage = () => {
           
           {/* Input Logo Navbar */}
           <Typography variant="subtitle1" sx={{mt: 3}}>Logo Navbar</Typography>
-          {userInfo.navbar_logo_url && <img src={`${BACKEND_URL}${userInfo.navbar_logo_url}`} alt="logo preview" style={{height: '40px', background: '#ddd', padding: '5px', display: 'block', marginBottom: '10px'}} />}
+          {userInfo.navbar_logo_url && <img src={userInfo.navbar_logo_url.startsWith('http') ? userInfo.navbar_logo_url : `${BACKEND_URL}${userInfo.navbar_logo_url}`} alt="logo preview" style={{height: '40px', background: '#ddd', padding: '5px', display: 'block', marginBottom: '10px'}} />}
           <Button variant="contained" component="label">
             Upload Logo Baru
             <input type="file" hidden onChange={handleLogoFileChange} accept="image/*" />
@@ -295,7 +295,7 @@ const AdminSettingsPage = () => {
           <Typography variant="subtitle1" sx={{mt: 2}}>Gambar untuk Section "Tentang Saya"</Typography>
           {userInfo.about_image_url && (
             <img
-              src={`${BACKEND_URL}${userInfo.about_image_url}`}
+              src={userInfo.about_image_url?.startsWith('http') ? userInfo.about_image_url : `${BACKEND_URL}${userInfo.about_image_url}`}
               alt="about preview"
               style={{width: '150px', height: 'auto', display: 'block', marginBottom: '10px'}}
             />

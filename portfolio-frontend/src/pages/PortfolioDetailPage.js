@@ -71,7 +71,10 @@ const PortfolioDetailPage = () => {
   const tagsArray = rawTags ? rawTags.split(',').map(t => t.trim()) : ['NO TAGS'];
 
   const description = project[`description_${lang}`] || 'No description available.';
-  const coverImage = project.image_url ? `${BACKEND_URL}${project.image_url}` : 'https://via.placeholder.com/900x500/1125d6/ffed00?text=NO+IMAGE';
+  // Cek apakah URL sudah mengandung 'http', jika tidak tambahkan BACKEND_URL
+  const coverImage = project.image_url 
+    ? (project.image_url.startsWith('http') ? project.image_url : `${BACKEND_URL}${project.image_url}`) 
+    : 'https://via.placeholder.com/900x500/1125d6/ffed00?text=NO+IMAGE';
 
   return (
     <>
@@ -261,7 +264,8 @@ const PortfolioDetailPage = () => {
                       }}
                     >
                       <img
-                        src={`${BACKEND_URL}${image.image_url}`}
+                        // Cek URL untuk gambar galeri juga
+                        src={image.image_url.startsWith('http') ? image.image_url : `${BACKEND_URL}${image.image_url}`}
                         alt={`Gallery ${index}`}
                         style={{
                           width: '100%',
