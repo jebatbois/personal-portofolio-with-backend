@@ -10,7 +10,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import { FaSpotify } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const ContactPage = () => {
   const [userInfo, setUserInfo] = useState(null);

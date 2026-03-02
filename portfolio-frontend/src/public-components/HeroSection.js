@@ -5,7 +5,7 @@ import { Container, Typography, Box } from '@mui/material';
 import ArrowIcon from './icons/ArrowIcon';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const HeroSection = () => {
   const [userInfo, setUserInfo] = useState(null);

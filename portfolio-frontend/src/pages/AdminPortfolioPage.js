@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const AdminPortfolioPage = () => {
   const [portfolios, setPortfolios] = useState([]);

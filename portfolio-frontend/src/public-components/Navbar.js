@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const Navbar = () => {
   const [logoUrl, setLogoUrl] = useState('');

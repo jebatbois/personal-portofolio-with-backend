@@ -7,7 +7,7 @@ import Navbar from '../public-components/Navbar';
 import Footer from '../public-components/Footer';
 import { useTranslation } from 'react-i18next'; 
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const ArticleListPage = () => {
   const [articles, setArticles] = useState([]);

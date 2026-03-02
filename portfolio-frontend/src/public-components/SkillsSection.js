@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { DiReact, DiNodejsSmall, DiHtml5, DiCss3, DiMysql, DiPython } from 'react-icons/di';
 import { SiFigma, SiCplusplus, SiLaravel, SiKotlin, SiSmartthings } from "react-icons/si";
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const getSkillIcon = (skillName) => {
   const lowerCaseName = skillName.toLowerCase();

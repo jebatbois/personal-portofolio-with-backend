@@ -5,7 +5,7 @@ import { Container, Typography, Box, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
 
 const PortfolioSection = () => {
   const [portfolios, setPortfolios] = useState([]);
