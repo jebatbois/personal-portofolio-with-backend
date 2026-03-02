@@ -8,7 +8,8 @@ exports.getAllPortfolios = async (req, res) => {
     const nameCol = `project_name_${lang}`;
     const descCol = `description_${lang}`;
     const tagsCol = `tags_${lang}`;
-    const sql = `SELECT id, ${nameCol} as project_name, ${descCol} as description, image_url, project_link, ${tagsCol} as tags FROM portfolio ORDER BY id DESC`;
+    const statusCol = `status_${lang}`;
+    const sql = `SELECT id, ${nameCol} as project_name, ${descCol} as description, image_url, project_link, ${tagsCol} as tags, ${statusCol} as status FROM portfolio ORDER BY id DESC`;
     const [rows] = await db.query(sql);
     res.status(200).json(rows);
   } catch (error) {
@@ -30,12 +31,12 @@ exports.getPortfolioById = async (req, res) => {
 
 // Membuat data baru dengan input untuk kedua bahasa
 exports.createPortfolio = async (req, res) => {
-  const { project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en } = req.body;
+  const { project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, status_id, status_en } = req.body;
   try {
     const sql = `INSERT INTO portfolio 
-      (project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const [result] = await db.query(sql, [project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en]);
+      (project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, status_id, status_en) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const [result] = await db.query(sql, [project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, status_id, status_en]);
     res.status(201).json({ id: result.insertId, ...req.body });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
@@ -45,14 +46,16 @@ exports.createPortfolio = async (req, res) => {
 // Mengupdate data dengan input untuk kedua bahasa
 exports.updatePortfolio = async (req, res) => {
   const { id } = req.params;
-  const { project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en } = req.body;
+  const { project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, status_id, status_en } = req.body;
   try {
     const sql = `UPDATE portfolio SET 
       project_name_id = ?, project_name_en = ?, description_id = ?, description_en = ?, 
-      image_url = ?, project_link = ?, tags_id = ?, tags_en = ? 
+      image_url = ?, project_link = ?, tags_id = ?, tags_en = ?, status_id = ?, status_en = ? 
       WHERE id = ?`;
-    await db.query(sql, [project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, id]);
-    res.status(200).json({ message: 'Portfolio berhasil diupdate' });
+    await db.query(sql, [project_name_id, project_name_en, description_id, description_en, image_url, project_link, tags_id, tags_en, status_id, status_en, id]);
+    // Ambil data terbaru setelah update
+    const [rows] = await db.query('SELECT * FROM portfolio WHERE id = ?', [id]);
+    res.status(200).json(rows[0]);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }

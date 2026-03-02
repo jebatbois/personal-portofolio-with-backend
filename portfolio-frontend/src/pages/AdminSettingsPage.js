@@ -160,6 +160,17 @@ const AdminSettingsPage = () => {
         <Box component="form" onSubmit={handleSubmit}>
           <TextField label="Nama Lengkap" name="full_name" value={userInfo.full_name} onChange={handleChange} fullWidth margin="normal" />
 
+          {/* Input Email */}
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={userInfo.email || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+          />
+
           {/* Tambahkan field baru di sini */}
           <Box sx={{ display: 'flex', gap: 2 }}>
             <TextField

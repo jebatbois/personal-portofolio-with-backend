@@ -95,7 +95,7 @@ const Navbar = () => {
               />
             )}
             <Typography variant="h6" sx={{ fontFamily: "'Anton', sans-serif", fontSize: { xs: '1.5rem', sm: '2rem' }, color: '#ffed00', textShadow: '2px 2px 0px #000', letterSpacing: '1px' }}>
-              RIFQY<span style={{ color: '#f23a18' }}>.</span>DEV
+              RIFQY<span style={{ color: '#f23a18' }}>.</span>AP
             </Typography>
           </Box>
 

@@ -38,7 +38,18 @@ const AdminPortfolioPage = () => {
   useEffect(() => { fetchPortfolios(); }, []);
 
   const resetForm = () => {
-    setFormData({ project_name: '', description: '', project_link: '', tags: '' });
+    setFormData({
+      project_name_id: '',
+      project_name_en: '',
+      description_id: '',
+      description_en: '',
+      tags_id: '',
+      tags_en: '',
+      status_id: 'Selesai',
+      status_en: 'Completed',
+      project_link: '',
+      image_url: ''
+    });
     setMainImageFile(null);
     setGalleryImageFiles([]);
     setExistingGallery([]);
@@ -56,7 +67,12 @@ const AdminPortfolioPage = () => {
     // Ambil data detail dari backend
     try {
       const res = await axios.get(`${BACKEND_URL}/api/portfolio/${portfolio.id}`);
-      setFormData(res.data); // res.data berisi semua field multi-bahasa
+      // Pastikan status_id dan status_en selalu ada di formData
+      setFormData({
+        ...res.data,
+        status_id: res.data.status_id || 'Selesai',
+        status_en: res.data.status_en || 'Completed'
+      });
       const galleryRes = await axios.get(`${BACKEND_URL}/api/portfolio/${portfolio.id}/images`);
       setExistingGallery(galleryRes.data);
     } catch (error) {
@@ -209,6 +225,14 @@ const AdminPortfolioPage = () => {
               required 
             />
             <TextField 
+              label="Status (ID)" 
+              name="status_id" 
+              value={formData.status_id || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            <TextField 
               label="Deskripsi (ID)" 
               name="description_id" 
               value={formData.description_id || ''} 
@@ -235,6 +259,14 @@ const AdminPortfolioPage = () => {
               label="Project Name (EN)" 
               name="project_name_en" 
               value={formData.project_name_en || ''} 
+              onChange={handleChange} 
+              fullWidth 
+              margin="normal" 
+            />
+            <TextField 
+              label="Status (EN)" 
+              name="status_en" 
+              value={formData.status_en || ''} 
               onChange={handleChange} 
               fullWidth 
               margin="normal" 

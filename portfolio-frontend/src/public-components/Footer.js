@@ -33,7 +33,7 @@ const Footer = () => {
     { id: 'linkedin', icon: <LinkedInIcon fontSize="large" />, url: userInfo.linkedin_url },
     { id: 'instagram', icon: <InstagramIcon fontSize="large" />, url: userInfo.instagram_url },
     { id: 'spotify', icon: <FaSpotify size={35} />, url: userInfo.spotify_url },
-    { id: 'email', icon: <EmailIcon fontSize="large" />, url: 'mailto:rifqyprayuda204@gmail.com' }
+    { id: 'email', icon: <EmailIcon fontSize="large" />, url: userInfo.email ? `mailto:${userInfo.email}` : null }
   ].filter(social => social.url); // Hanya tampilkan ikon jika URL-nya ada di database
 
   return (
@@ -63,7 +63,7 @@ const Footer = () => {
             </Typography>
             <Typography variant="h6" sx={{ color: '#ffed00', fontFamily: "'Inter', sans-serif", fontWeight: 800 }}>
               {/* Menampilkan email dari database atau fallback statis */}
-              {'rifqyprayuda204@gmail.com'}
+              {userInfo.email || 'rifqyprayuda204@gmail.com'} 
             </Typography>
           </Grid>
 

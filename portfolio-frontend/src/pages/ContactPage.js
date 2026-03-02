@@ -1,7 +1,7 @@
 // src/pages/ContactPage.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, Grid, Paper, Box, IconButton, TextField, Button, CircularProgress, Alert } from '@mui/material';
+import { Container, Typography, Grid, Box, IconButton, TextField, Button, CircularProgress } from '@mui/material';
 import Navbar from '../public-components/Navbar';
 import Footer from '../public-components/Footer';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -20,11 +20,10 @@ const ContactPage = () => {
   const { t, i18n } = useTranslation('common');
 
   useEffect(() => {
-    // Ambil data userinfo sesuai bahasa
     axios.get(`${BACKEND_URL}/api/userinfo?lang=${i18n.language}`)
       .then(res => {
-        setUserInfo(res.data);
-        console.log('userInfo:', res.data); // CEK APAKAH ADA spotify_url
+        const data = Array.isArray(res.data) ? res.data[0] : res.data;
+        setUserInfo(data);
       })
       .catch(err => console.error("Gagal mengambil info user:", err));
   }, [i18n.language]);
@@ -38,134 +37,225 @@ const ContactPage = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formState.email)) {
-      setFormMessage({ type: 'error', text: t('contact_form_email_invalid') });
+      setFormMessage({ type: 'error', text: t('contact_form_email_invalid', 'Email tidak valid.') });
       setIsSubmitting(false);
       return;
     }
 
     axios.post(`${BACKEND_URL}/api/contact`, formState)
       .then(() => {
-        setFormMessage({ type: 'success', text: t('contact_success_message') });
+        setFormMessage({ type: 'success', text: t('contact_success_message', 'Pesan berhasil terkirim!') });
         setFormState({ name: '', email: '', message: '' });
       })
       .catch(() => {
-        setFormMessage({ type: 'error', text: t('contact_error_message') });
+        setFormMessage({ type: 'error', text: t('contact_error_message', 'Gagal mengirim pesan.') });
       })
       .finally(() => {
         setIsSubmitting(false);
       });
   };
 
-  if (!userInfo) return <div>Loading...</div>;
+  // Loading Screen
+  if (!userInfo) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <Box sx={{ flexGrow: 1, bgcolor: '#1125d6', color: '#ffed00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Anton', sans-serif", fontSize: '3rem' }}>
+          LOADING...
+        </Box>
+        <Footer />
+      </Box>
+    );
+  }
 
-  // Pilih value/service sesuai bahasa
-  const serviceDesc = userInfo[`service_description_${i18n.language}`] || userInfo.service_description || t('service_fallback');
+  const serviceDesc = userInfo[`service_description_${i18n.language}`] || userInfo.service_description || t('service_fallback', 'Saya terbuka untuk kolaborasi proyek, pekerjaan freelance, dan diskusi teknologi.');
+
+  const socialLinks = [
+    { id: 'github', icon: <GitHubIcon fontSize="large" />, url: userInfo.github_url },
+    { id: 'linkedin', icon: <LinkedInIcon fontSize="large" />, url: userInfo.linkedin_url },
+    { id: 'instagram', icon: <InstagramIcon fontSize="large" />, url: userInfo.instagram_url },
+    { id: 'spotify', icon: <FaSpotify size={35} />, url: userInfo.spotify_url }
+  ].filter(s => s.url);
+
+  // Custom CSS untuk input field agar bergaya Brutalism
+  const brutalInputSx = {
+    '& .MuiInputBase-root': {
+      borderRadius: 0,
+      border: '3px solid #000',
+      bgcolor: '#fff',
+      boxShadow: '4px 4px 0px #000',
+      transition: 'all 0.1s',
+      fontFamily: "'Inter', sans-serif",
+      fontWeight: 600,
+      '&.Mui-focused': {
+        boxShadow: '6px 6px 0px #1125d6', // Shadow biru saat diklik
+        transform: 'translate(-2px, -2px)'
+      }
+    },
+    '& .MuiOutlinedInput-notchedOutline': { border: 'none' }, // Buang border bawaan MUI
+    '& .MuiInputLabel-root': { fontFamily: "'Anton', sans-serif", fontSize: '1.2rem', color: '#000', textTransform: 'uppercase' },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#1125d6' },
+    mb: 4
+  };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#fff' }}>
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: 'grey.100' }}>
-        <Container maxWidth="lg" sx={{ py: 8 }}>
-          <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-            {t('contact_title')}
+      
+      <Box component="main" sx={{ flexGrow: 1, borderBottom: '4px solid #000', pb: 15 }}>
+        
+        {/* HEADER SECTION */}
+        <Box sx={{ bgcolor: '#ffed00', borderBottom: '4px solid #000', py: 10, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <Typography sx={{ position: 'absolute', top: -30, left: '50%', transform: 'translateX(-50%)', fontSize: '15rem', fontFamily: "'Anton', sans-serif", color: 'rgba(0,0,0,0.03)', pointerEvents: 'none', lineHeight: 1 }}>
+            PING ME
           </Typography>
-          <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
-            {t('contact_subtitle')}
-          </Typography>
+          
+          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+            <Typography variant="h1" sx={{ fontFamily: "'Anton', sans-serif", textTransform: 'uppercase', color: '#000', fontSize: { xs: '4rem', md: '7rem' }, textShadow: '6px 6px 0px #fff', lineHeight: 1, mb: 2 }}>
+              {t('contact_title', 'GET IN TOUCH.')}
+            </Typography>
+            <Box sx={{ display: 'inline-block', bgcolor: '#000', color: '#fff', px: 2, py: 1, transform: 'rotate(1deg)' }}>
+              <Typography sx={{ fontWeight: 800, fontFamily: "'Inter', sans-serif", textTransform: 'uppercase' }}>
+                {t('contact_subtitle', 'Tinggalkan pesan. Saya akan membalas secepatnya.')}
+              </Typography>
+            </Box>
+          </Container>
+        </Box>
 
-          <Grid container spacing={5} justifyContent="center">
-            {/* Kolom Kiri: Form Kontak */}
+        <Container maxWidth="lg" sx={{ mt: 8 }}>
+          <Grid container spacing={8}>
+            
+            {/* ========================================= */}
+            {/* KOLOM KIRI: FORM KONTAK                   */}
+            {/* ========================================= */}
             <Grid item xs={12} md={7}>
-              <Paper sx={{ p: 4 }}>
-                <Typography variant="h5" gutterBottom>{t('contact_form_title')}</Typography>
-                <Box component="form" onSubmit={handleSubmit}>
-                  <TextField label={t('contact_form_name')} name="name" value={formState.name} onChange={handleInputChange} fullWidth margin="normal" required />
-                  <TextField label={t('contact_form_email')} name="email" type="email" value={formState.email} onChange={handleInputChange} fullWidth margin="normal" required />
-                  <TextField label={t('contact_form_message')} name="message" value={formState.message} onChange={handleInputChange} fullWidth margin="normal" multiline rows={5} required />
-                  <Button type="submit" variant="contained" size="large" sx={{ mt: 2 }} disabled={isSubmitting}>
-                    {isSubmitting ? <CircularProgress size={24} /> : t('contact_form_button')}
-                  </Button>
-                  {formMessage.text && (
-                    <Alert severity={formMessage.type} sx={{ mt: 3 }}>
-                      {formMessage.text}
-                    </Alert>
-                  )}
+              <Box sx={{ 
+                bgcolor: '#fff', 
+                border: '4px solid #000', 
+                boxShadow: '12px 12px 0px #000', 
+                p: { xs: 3, md: 5 },
+                position: 'relative'
+              }}>
+                {/* Aksen Label di Form */}
+                <Box sx={{ position: 'absolute', top: -20, left: 20, bgcolor: '#1125d6', color: '#fff', border: '3px solid #000', px: 2, py: 0.5 }}>
+                  <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.2rem', letterSpacing: '1px' }}>
+                    {t('contact_form_title', 'TRANSMISSION FORM')}
+                  </Typography>
                 </Box>
-              </Paper>
+
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                  <TextField sx={brutalInputSx} label={t('contact_form_name', 'NAME')} name="name" value={formState.name} onChange={handleInputChange} fullWidth required />
+                  <TextField sx={brutalInputSx} label={t('contact_form_email', 'EMAIL')} name="email" type="email" value={formState.email} onChange={handleInputChange} fullWidth required />
+                  <TextField sx={brutalInputSx} label={t('contact_form_message', 'MESSAGE')} name="message" value={formState.message} onChange={handleInputChange} fullWidth multiline rows={6} required />
+                  
+                  {/* Pesan Sukses / Error */}
+                  {formMessage.text && (
+                    <Box sx={{ 
+                      bgcolor: formMessage.type === 'success' ? '#00e676' : '#f23a18', 
+                      color: '#000', 
+                      border: '3px solid #000', 
+                      p: 2, 
+                      mb: 4,
+                      boxShadow: '4px 4px 0px #000',
+                      fontWeight: 900
+                    }}>
+                      {formMessage.text}
+                    </Box>
+                  )}
+
+                  {/* Tombol Submit Raksasa */}
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    fullWidth
+                    sx={{ 
+                      bgcolor: '#f23a18', 
+                      color: '#fff', 
+                      border: '4px solid #000',
+                      boxShadow: '6px 6px 0px #000',
+                      fontFamily: "'Anton', sans-serif",
+                      fontSize: '1.5rem',
+                      py: 2,
+                      borderRadius: 0,
+                      transition: 'all 0.1s',
+                      '&:hover': { bgcolor: '#fff', color: '#000', transform: 'translate(-2px, -2px)', boxShadow: '8px 8px 0px #000' },
+                      '&:disabled': { bgcolor: '#ccc', color: '#666' }
+                    }}
+                  >
+                    {isSubmitting ? <CircularProgress size={28} sx={{ color: '#000' }} /> : t('contact_form_button', 'SEND MESSAGE >')}
+                  </Button>
+                </Box>
+              </Box>
             </Grid>
 
-            {/* Kolom Kanan: Info Tambahan */}
+            {/* ========================================= */}
+            {/* KOLOM KANAN: INFO & SOSIAL MEDIA          */}
+            {/* ========================================= */}
             <Grid item xs={12} md={5}>
-              <Paper sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h6" gutterBottom>{t('social_media_title')}</Typography>
-                <Box>
-                  <IconButton component="a" href={userInfo.github_url} target="_blank" aria-label="github" sx={{
-                    color: '#222',
-                    transition: 'color 0.2s, background 0.2s',
-                    '&:hover': {
-                      color: '#fff',
-                      backgroundColor: '#333', // warna hover GitHub
-                    }
-                  }}>
-                    <GitHubIcon fontSize="large" />
-                  </IconButton>
-                  <IconButton component="a" href={userInfo.linkedin_url} target="_blank" aria-label="linkedin" sx={{
-                    color: '#0A66C2',
-                    transition: 'color 0.2s, background 0.2s',
-                    '&:hover': {
-                      color: '#fff',
-                      backgroundColor: '#0A66C2', // warna hover LinkedIn
-                    }
-                  }}>
-                    <LinkedInIcon fontSize="large" />
-                  </IconButton>
-                  <IconButton component="a" href={userInfo.instagram_url} target="_blank" aria-label="instagram" sx={{
-                    color: '#E1306C',
-                    transition: 'color 0.2s, background 0.2s',
-                    '&:hover': {
-                      color: '#fff',
-                      backgroundColor: '#E1306C', // warna hover Instagram
-                    }
-                  }}>
-                    <InstagramIcon fontSize="large" />
-                  </IconButton>
-                  <IconButton
-                    component="a"
-                    href={userInfo.spotify_url || '#'}
-                    target="_blank"
-                    rel="noopener"
-                    sx={{
-                      color: '#1DB954', // Hijau Spotify
-                      transition: 'color 0.2s, background 0.2s',
-                      '&:hover': {
-                        color: '#fff',
-                        backgroundColor: '#1DB954', // Warna hover Spotify
-                      }
-                    }}
-                    aria-label="Spotify"
-                  >
-                    <FaSpotify size={35} />
-                  </IconButton>
-                </Box>
-                {/* Tambahkan email di bawah social media */}
-                {userInfo.email && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" color="text.secondary">Email</Typography>
-                    <Typography variant="body1">
-                      <a href={`mailto:${userInfo.email}`} style={{ color: '#1976d2', textDecoration: 'none' }}>
-                        {userInfo.email}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                
+                {/* Box 1: Sosial Media & Email */}
+                <Box sx={{ 
+                  bgcolor: '#1125d6', 
+                  color: '#fff', 
+                  p: 4, 
+                  border: '4px solid #000', 
+                  boxShadow: '8px 8px 0px #000',
+                  transform: 'rotate(1deg)'
+                }}>
+                  <Typography variant="h4" sx={{ fontFamily: "'Anton', sans-serif", textTransform: 'uppercase', mb: 3, color: '#ffed00' }}>
+                    {t('social_media_title', 'DIGITAL PRESENCE')}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 4 }}>
+                    {socialLinks.map((social) => (
+                      <IconButton 
+                        key={social.id}
+                        component="a" 
+                        href={social.url} 
+                        target="_blank" 
+                        aria-label={social.id} 
+                        sx={{
+                          bgcolor: '#fff', color: '#000', borderRadius: 0, border: '3px solid #000', boxShadow: '4px 4px 0px #000', p: 1.5,
+                          transition: 'all 0.1s',
+                          '&:hover': { bgcolor: '#ffed00', transform: 'translate(-2px, -2px)', boxShadow: '6px 6px 0px #000' }
+                        }}
+                      >
+                        {social.icon}
+                      </IconButton>
+                    ))}
+                  </Box>
+
+                  <Box sx={{ borderTop: '2px solid #000', pt: 3 }}>
+                    <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.2rem', color: '#ffed00', mb: 1 }}>DIRECT EMAIL:</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, wordWrap: 'break-word' }}>
+                      <a href={`mailto:${userInfo.email || 'rifqyprayuda204@gmail.com'}`} style={{ color: '#fff', textDecoration: 'underline', textDecorationThickness: '3px' }}>
+                        {userInfo.email || 'rifqyprayuda204@gmail.com'}
                       </a>
                     </Typography>
                   </Box>
-                )}
-              </Paper>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>{t('service_title')}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {serviceDesc}
-                </Typography>
-              </Paper>
+                </Box>
+
+                {/* Box 2: Services / Kolaborasi */}
+                <Box sx={{ 
+                  bgcolor: '#ffed00', 
+                  color: '#000', 
+                  p: 4, 
+                  border: '4px solid #000', 
+                  boxShadow: '8px 8px 0px #f23a18', // Shadow merah
+                  transform: 'rotate(-1deg)'
+                }}>
+                  <Typography variant="h4" sx={{ fontFamily: "'Anton', sans-serif", textTransform: 'uppercase', mb: 2 }}>
+                    {t('service_title', 'SERVICES')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: '1.1rem', lineHeight: 1.6 }}>
+                    {serviceDesc}
+                  </Typography>
+                </Box>
+
+              </Box>
             </Grid>
+
           </Grid>
         </Container>
       </Box>

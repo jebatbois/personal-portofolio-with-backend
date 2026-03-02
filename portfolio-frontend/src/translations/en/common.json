@@ -35,6 +35,9 @@
   "portfolio_title": "LATEST\nPROJECTS",
   "portfolio_subtitle": "A collection of recent work. Scroll sideways to explore the gallery.",
   "footer_cta": "LET'S BUILD SOMETHING BIG.",
-  "footer_copyright": "© 2026 RIFQY.DEV. All Rights Reserved."
+  "footer_copyright": "© 2026 RIFQY.DEV. All Rights Reserved.",
+  "portfolio_built_with": "BUILT WITH:",
+  "portfolio_about_project": "ABOUT THE PROJECT",
+  "portfolio_visit_project": "VISIT PROJECT"
   
 }
