@@ -36,9 +36,11 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/articles', articlesRoutes);
 app.use('/api/upload', uploadRoutes);
 
-app.listen(port, () => {
-  console.log(`🚀 Server backend berjalan di http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`🚀 Server backend berjalan di http://localhost:${port}`);
+  });
+}
 
 // TAMBAHKAN BARIS INI UNTUK VERCEL
 module.exports = app;
