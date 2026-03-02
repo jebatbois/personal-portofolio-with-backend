@@ -4,14 +4,11 @@
   "nav_contact": "Kontak",
   "hero_greeting": "Halo, saya {{name}}.",
   "hero_bio": "Seorang developer yang bersemangat untuk menciptakan hal-hal luar biasa.",
-  "skills_title": "Keahlian",
-  "resume_title": "Riwayat",
   "experience_title": "Pengalaman Kerja",
   "education_title": "Pendidikan",
   "organization_title": "Organisasi",
   "activity_title": "Aktivitas & Pencapaian",
   "present_time": "Sekarang",
-  "portfolio_title": "Proyek Saya",
   "view_project_button": "Lihat Proyek",
   "footer_rights": "Hak cipta dilindungi.",
   "footer_built": "Dibuat dengan React, Express, dan 🔥 oleh Rifqy A. Prayuda",
@@ -32,5 +29,11 @@
   "about_me_title": "Tentang Saya",
   "dob_label": "Tanggal Lahir",
   "location_label": "Lokasi",
-  "hobbies_label": "Hobi"
+  "hobbies_label": "Hobi",
+  "skills_title": "SEKIL",
+  "resume_title": "REKAM JEJAK",
+  "portfolio_title": "PROYEK\nTERBARU",
+  "portfolio_subtitle": "Sebuah koleksi karya terbaru. Geser ke samping untuk menjelajah galeri.",
+  "footer_cta": "MARI BUAT SESUATU YANG BESAR.",
+  "footer_copyright": "© 2026 RIFQY.DEV. Hak Cipta Dilindungi."
 }

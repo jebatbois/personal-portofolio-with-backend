@@ -12,25 +12,44 @@ const HeroSection = () => {
   const { t, i18n } = useTranslation('common');
 
   useEffect(() => {
-    // API ini sudah cerdas, ia akan mengirim 'bio' yang sudah diterjemahkan
+    // API dengan parameter bahasa
     axios.get(`${BACKEND_URL}/api/userinfo?lang=${i18n.language}`)
-      .then(res => setUserInfo(res.data))
+      .then(res => {
+        // Ambil data pertama jika berupa array, atau langsung objeknya
+        const data = Array.isArray(res.data) ? res.data[0] : res.data;
+        setUserInfo(data);
+      })
       .catch(err => console.error("Error fetching user info:", err));
-  }, [i18n.language]); // useEffect akan berjalan lagi setiap kali bahasa berubah
+  }, [i18n.language]);
 
   if (!userInfo) {
-    return <Box sx={{ minHeight: 'calc(100vh - 64px)', bgcolor: 'primary.main' }} />;
+    return (
+      <Box sx={{ 
+        minHeight: 'calc(100vh - 80px)', 
+        bgcolor: '#1125d6', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        color: '#ffed00',
+        fontFamily: "'Anton', sans-serif",
+        fontSize: '2rem'
+      }}>
+        LOADING...
+      </Box>
+    );
   }
 
   return (
     <Box 
       sx={{ 
-        bgcolor: 'primary.main', 
-        color: 'white', 
-        minHeight: 'calc(100vh - 64px)',
+        bgcolor: '#1125d6', // Biru elektrik Neo-Brutalism
+        color: '#fff', 
+        minHeight: 'calc(100vh - 80px)',
         display: 'flex',
         alignItems: 'center',
-        py: { xs: 8, md: 0 }
+        py: { xs: 8, md: 0 },
+        borderBottom: '4px solid #000', // Batas tegas di bawah hero
+        overflow: 'hidden' // Jaga-jaga kalau elemen panah keluar batas
       }}
     >
       <Container maxWidth="lg">
@@ -39,40 +58,107 @@ const HeroSection = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 4,
+            gap: { xs: 6, md: 4 },
             flexDirection: { xs: 'column-reverse', md: 'row' } 
           }}
         >
-          {/* KOLOM KIRI (TEKS) */}
+          {/* ======================================= */}
+          {/* KOLOM KIRI (TEKS SALAM & BIO)           */}
+          {/* ======================================= */}
           <Box sx={{ flexBasis: { xs: '100%', md: '55%' }, position: 'relative', textAlign: { xs: 'center', md: 'left' } }}>
             
-            <Box sx={{ position: 'absolute', top: 5, right: -60, display: { xs: 'none', md: 'block' }, transform: 'rotate(10deg)' }}>
+            {/* Arrow Icon (Tetap dipertahankan) */}
+          {/* Arrow Icon (Turun ke tengah) */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: '50%', // Posisikan di tengah secara vertikal
+              right: { md: -60, lg: -50 }, // Geser ke kiri agar tidak tertimpa foto
+              display: { xs: 'none', md: 'block' }, 
+              // translateY(-50%) memastikan panahnya benar-benar di titik tengah
+              // rotate(25deg) agak dimiringkan ke bawah agar seolah menunjuk ke foto profilmu
+              transform: 'translateY(-50%) rotate(25deg) scale(1.5)', 
+              zIndex: 0 
+            }}>
               <ArrowIcon />
             </Box>
 
-            <Typography variant="h2" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
-              {/* Menggunakan variabel dari terjemahan */}
-              {t('hero_greeting', { name: userInfo.full_name })}
+            {/* Teks Salam Raksasa ala Poster */}
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontFamily: "'Anton', sans-serif",
+                fontSize: { xs: '12vw', md: '4vw', lg: '6vw' }, // Ukuran dinamis super besar
+                fontWeight: 'normal',
+                color: '#ffed00', // Kuning terang
+                textTransform: 'uppercase',
+                textShadow: { xs: '4px 4px 0px #000', md: '6px 6px 0px #000' }, // Hard shadow
+                lineHeight: 0.9,
+                mb: 4,
+                position: 'relative',
+                zIndex: 2
+              }}
+            >
+              {t('hero_greeting', { name: userInfo.full_name || 'RIFQY' })}
             </Typography>
 
-            {/* --- PERBAIKAN FINAL ADA DI SINI --- */}
-            <Typography variant="h5" sx={{ opacity: 0.9 }}>
-              {userInfo.hero_bio || t('hero_bio')}
-            </Typography>
+            {/* Box Bio ala Stiker / Label Jalanan */}
+            <Box sx={{
+              display: 'inline-block',
+              bgcolor: '#fff',
+              color: '#000',
+              border: '3px solid #000',
+              boxShadow: '6px 6px 0px #000',
+              p: { xs: 2, md: 3 },
+              transform: 'rotate(-2deg)', // Dimiringkan sedikit ala stiker
+              position: 'relative',
+              zIndex: 2,
+              maxWidth: '90%'
+            }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontFamily: "'Inter', sans-serif", // Font body tebal
+                  fontWeight: 800,
+                  fontSize: { xs: '1rem', md: '1.2rem' },
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                {userInfo.hero_bio || t('hero_bio')}
+              </Typography>
+            </Box>
             
           </Box>
           
-          {/* KOLOM KANAN (FOTO) */}
-          <Box sx={{ flexBasis: { xs: '100%', md: '40%' }, display: 'flex', justifyContent: 'center' }}>
+          {/* ======================================= */}
+          {/* KOLOM KANAN (FOTO PROFIL)                 */}
+          {/* ======================================= */}
+          <Box sx={{ flexBasis: { xs: '100%', md: '40%' }, display: 'flex', justifyContent: 'center', position: 'relative' }}>
             {userInfo.profile_picture_url && (
               <Box 
                 component="img"
-                src={`${BACKEND_URL}${userInfo.profile_picture_url}`}
+                src={userInfo.profile_picture_url.startsWith('http') ? userInfo.profile_picture_url : `${BACKEND_URL}${userInfo.profile_picture_url}`}
                 alt={userInfo.full_name}
-                sx={{ width: '100%', maxWidth: { xs: '280px', md: '450px' }, maxHeight: '500px', height: 'auto', borderRadius: '12px', objectFit: 'cover' }}
+                sx={{ 
+                  width: '100%', 
+                  maxWidth: { xs: '280px', md: '400px' }, 
+                  height: { xs: '350px', md: '500px' }, 
+                  objectFit: 'cover',
+                  // Menghapus borderRadius: '12px' peninggalan desain lama
+                  borderRadius: '0px', 
+                  border: '4px solid #000',
+                  bgcolor: '#ffed00', // Warna background kuning kalau fotonya transparan
+                  boxShadow: '12px 12px 0px #f23a18, 12px 12px 0px 4px #000', // Dobel bayangan brutalism (Merah + Hitam)
+                  transition: 'transform 0.2s ease',
+                  '&:hover': {
+                    transform: 'translate(-4px, -4px)',
+                    boxShadow: '16px 16px 0px #f23a18, 16px 16px 0px 4px #000',
+                  }
+                }}
               />
             )}
           </Box>
+
         </Box>
       </Container>
     </Box>

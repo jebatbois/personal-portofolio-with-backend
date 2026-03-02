@@ -4,14 +4,11 @@
   "nav_contact": "Contact",
   "hero_greeting": "Hello, I'm {{name}}.",
   "hero_bio": "A passionate developer ready to create amazing things.",
-  "skills_title": "Skills",
-  "resume_title": "Resume",
   "experience_title": "Work Experience",
   "education_title": "Education",
   "organization_title": "Organizations",
   "activity_title": "Activities & Achievements",
   "present_time": "Present",
-  "portfolio_title": "My Projects",
   "view_project_button": "View Project",
   "footer_rights": "All rights reserved.",
   "footer_built": "Built with React, Express, and 🔥 by Rifqy A. Prayuda",
@@ -32,5 +29,12 @@
   "about_me_title": "About Me",
   "dob_label": "Date of Birth",
   "location_label": "Location",
-  "hobbies_label": "Hobbies"
+  "hobbies_label": "Hobbies",
+  "skills_title": "MY ARSENAL",
+  "resume_title": "TRACK RECORD",
+  "portfolio_title": "LATEST\nPROJECTS",
+  "portfolio_subtitle": "A collection of recent work. Scroll sideways to explore the gallery.",
+  "footer_cta": "LET'S BUILD SOMETHING BIG.",
+  "footer_copyright": "© 2026 RIFQY.DEV. All Rights Reserved."
+  
 }
