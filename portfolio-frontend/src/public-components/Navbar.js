@@ -8,7 +8,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const Navbar = () => {
   const [logoUrl, setLogoUrl] = useState('');
@@ -38,6 +38,7 @@ const Navbar = () => {
     { label: t('nav_articles'), to: '/artikel' },
     { label: t('nav_contact'), to: '/kontak' },
   ];
+  
 
   const drawer = (
     <Box
@@ -89,7 +90,12 @@ const Navbar = () => {
             {logoUrl && (
               <Box 
                 component="img" 
-                src={logoUrl.startsWith('http') ? logoUrl : `${BACKEND_URL}${logoUrl}`} 
+                // --- KODE PEMBERSIH LOGO ---
+                src={(() => {
+                  let rawUrl = logoUrl;
+                  if (rawUrl.includes('/public')) rawUrl = rawUrl.replace('/public', '');
+                  return rawUrl.startsWith('http') ? rawUrl : `${BACKEND_URL}${rawUrl}`;
+                })()} 
                 alt="Logo" 
                 sx={{ height: 45, mr: 2, border: '2px solid #000', backgroundColor: '#fff', boxShadow: '2px 2px 0px #000' }}
               />

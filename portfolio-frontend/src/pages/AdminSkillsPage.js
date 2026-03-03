@@ -22,7 +22,7 @@ const AdminSkillsPage = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('https://personal-portofolio-with-backend.vercel.app/api/skills');
+      const response = await axios.get('https://rifqy-api.gt.tc/api/skills');
       setSkills(response.data);
     } catch (err) {
       console.error("GAGAL MENGAMBIL DATA SKILLS:", err);
@@ -43,7 +43,7 @@ const AdminSkillsPage = () => {
     e.preventDefault();
     const token = localStorage.getItem('authToken');
     try {
-      const response = await axios.post('https://personal-portofolio-with-backend.vercel.app/api/skills', newSkill, { headers: { Authorization: token } });
+      const response = await axios.post('https://rifqy-api.gt.tc/api/skills', newSkill, { headers: { Authorization: token } });
       setSkills(prevSkills => [...prevSkills, response.data]);
       setNewSkill({ skill_name_id: '', skill_name_en: '', percentage: 50 });
       alert('Skill berhasil ditambahkan!');
@@ -54,7 +54,7 @@ const AdminSkillsPage = () => {
     if (window.confirm("Yakin ingin menghapus skill ini?")) {
       const token = localStorage.getItem('authToken');
       try {
-        await axios.delete(`https://personal-portofolio-with-backend.vercel.app/api/skills/${id}`, { headers: { Authorization: token } });
+        await axios.delete(`https://rifqy-api.gt.tc/api/skills/${id}`, { headers: { Authorization: token } });
         setSkills(prevSkills => prevSkills.filter(skill => skill.id !== id));
         alert('Skill berhasil dihapus!');
       } catch (error) { alert('Gagal menghapus skill.'); }
@@ -67,7 +67,7 @@ const AdminSkillsPage = () => {
     const token = localStorage.getItem('authToken');
     try {
       // Ambil data lengkap dari backend (rute admin)
-      const res = await axios.get(`https://personal-portofolio-with-backend.vercel.app/api/skills/admin/${skill.id}`, {
+      const res = await axios.get(`https://rifqy-api.gt.tc/api/skills/admin/${skill.id}`, {
         headers: { Authorization: token }
       });
       setCurrentSkill({
@@ -89,7 +89,7 @@ const AdminSkillsPage = () => {
     if (!currentSkill) return;
     const token = localStorage.getItem('authToken');
     try {
-      await axios.put(`https://personal-portofolio-with-backend.vercel.app/api/skills/${currentSkill.id}`, currentSkill, { headers: { Authorization: token } });
+      await axios.put(`https://rifqy-api.gt.tc/api/skills/${currentSkill.id}`, currentSkill, { headers: { Authorization: token } });
       alert('Skill berhasil diupdate!');
       handleCloseEditDialog();
       fetchSkills();

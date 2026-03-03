@@ -11,7 +11,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import PeopleIcon from '@mui/icons-material/People';
 import EventIcon from '@mui/icons-material/Event';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const ResumeSection = () => {
   const [resumeItems, setResumeItems] = useState([]);
@@ -37,6 +37,9 @@ const ResumeSection = () => {
     const items = resumeItems.filter(item => item.item_type === type);
     if (items.length === 0) return null;
 
+    // Deteksi bahasa saat ini (id atau en)
+    const langSuffix = i18n.language === 'id' ? 'id' : 'en';
+
     return (
       <Box sx={{ mb: 10, width: '100%' }}>
         {/* Sub-judul kategori ala Headline koran */}
@@ -56,69 +59,80 @@ const ResumeSection = () => {
         </Typography>
 
         <Grid container spacing={4}>
-          {items.map((item, index) => (
-            <Grid item xs={12} md={6} key={item.id}>
-              <Box
-                component={RouterLink}
-                to={`/resume/${item.id}`}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  bgcolor: '#fff',
-                  border: '4px solid #000',
-                  p: 3,
-                  height: '100%',
-                  position: 'relative',
-                  boxShadow: '8px 8px 0px #000',
-                  transition: 'all 0.15s',
-                  '&:hover': {
-                    transform: 'translate(-4px, -4px)',
-                    boxShadow: '12px 12px 0px #ffed00, 12px 12px 0px 4px #000',
-                    '& .icon-box': { bgcolor: '#ffed00' }
-                  }
-                }}
-              >
-                {/* Tahun di pojok kanan atas ala Label Harga */}
-                <Box sx={{ 
-                  position: 'absolute', top: -15, right: 20, 
-                  bgcolor: '#000', color: '#fff', 
-                  px: 2, py: 0.5, 
-                  fontFamily: "'Anton', sans-serif",
-                  border: '2px solid #fff',
-                  zIndex: 2
-                }}>
-                  {new Date(item.start_date).getFullYear()} - {item.end_date ? new Date(item.end_date).getFullYear() : 'NOW'}
-                </Box>
+          {items.map((item, index) => {
+            // --- LOGIKA PEMILIHAN BAHASA & PENGAMAN DATA ---
+            const itemTitle = item[`title_${langSuffix}`] || item.title;
+            const itemSubtitle = item[`subtitle_${langSuffix}`] || item.subtitle;
+            const itemSummary = item[`summary_${langSuffix}`] || item.summary;
+            
+            // Pengaman format tahun (mencegah tulisan NaN)
+            const startYear = item.start_date ? new Date(item.start_date).getFullYear() : '';
+            const endYear = item.end_date ? new Date(item.end_date).getFullYear() : 'NOW';
 
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
-                  <Box className="icon-box" sx={{ 
-                    p: 1, border: '3px solid #000', bgcolor: '#eee', 
-                    display: 'flex', transition: 'background 0.2s' 
+            return (
+              <Grid item xs={12} md={6} key={item.id}>
+                <Box
+                  component={RouterLink}
+                  to={`/resume/${item.id}`}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    bgcolor: '#fff',
+                    border: '4px solid #000',
+                    p: 3,
+                    height: '100%',
+                    position: 'relative',
+                    boxShadow: '8px 8px 0px #000',
+                    transition: 'all 0.15s',
+                    '&:hover': {
+                      transform: 'translate(-4px, -4px)',
+                      boxShadow: '12px 12px 0px #ffed00, 12px 12px 0px 4px #000',
+                      '& .icon-box': { bgcolor: '#ffed00' }
+                    }
+                  }}
+                >
+                  {/* Tahun di pojok kanan atas ala Label Harga */}
+                  <Box sx={{ 
+                    position: 'absolute', top: -15, right: 20, 
+                    bgcolor: '#000', color: '#fff', 
+                    px: 2, py: 0.5, 
+                    fontFamily: "'Anton', sans-serif",
+                    border: '2px solid #fff',
+                    zIndex: 2
                   }}>
-                    {getIcon(item.item_type)}
+                    {startYear} - {endYear}
                   </Box>
-                  <Box>
-                    <Typography variant="h5" sx={{ fontFamily: "'Anton', sans-serif", textTransform: 'uppercase', lineHeight: 1.2 }}>
-                      {item.title}
-                    </Typography>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1125d6' }}>
-                      {item.subtitle}
-                    </Typography>
-                  </Box>
-                </Box>
 
-                {item.summary && (
-                  <Typography variant="body2" sx={{ 
-                    mt: 'auto', fontWeight: 600, borderTop: '2px solid #000', pt: 2, fontStyle: 'italic' 
-                  }}>
-                    {item.summary}
-                  </Typography>
-                )}
-              </Box>
-            </Grid>
-          ))}
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
+                    <Box className="icon-box" sx={{ 
+                      p: 1, border: '3px solid #000', bgcolor: '#eee', 
+                      display: 'flex', transition: 'background 0.2s' 
+                    }}>
+                      {getIcon(item.item_type)}
+                    </Box>
+                    <Box>
+                      <Typography variant="h5" sx={{ fontFamily: "'Anton', sans-serif", textTransform: 'uppercase', lineHeight: 1.2 }}>
+                        {itemTitle}
+                      </Typography>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1125d6' }}>
+                        {itemSubtitle}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {itemSummary && (
+                    <Typography variant="body2" sx={{ 
+                      mt: 'auto', fontWeight: 600, borderTop: '2px solid #000', pt: 2, fontStyle: 'italic' 
+                    }}>
+                      {itemSummary}
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+            );
+          })}
         </Grid>
       </Box>
     );

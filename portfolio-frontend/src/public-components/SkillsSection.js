@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { DiReact, DiNodejsSmall, DiHtml5, DiCss3, DiMysql, DiPython } from 'react-icons/di';
 import { SiFigma, SiCplusplus, SiLaravel, SiKotlin, SiSmartthings } from "react-icons/si";
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const getSkillIcon = (skillName) => {
+  if (!skillName) return null;
   const lowerCaseName = skillName.toLowerCase();
   const iconProps = { size: "2rem", color: "inherit" };
   
@@ -29,7 +30,7 @@ const getSkillIcon = (skillName) => {
 };
 
 const SkillsSection = () => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +51,7 @@ const SkillsSection = () => {
       <Container maxWidth="lg">
         
         {/* JUDUL SEKSI ALA POSTER */}
- <Typography variant="h2" align="center" sx={{ 
+        <Typography variant="h2" align="center" sx={{ 
           fontFamily: "'Anton', sans-serif", 
           color: '#ffed00', 
           fontSize: { xs: '3.5rem', md: '6rem' },
@@ -69,51 +70,63 @@ const SkillsSection = () => {
             gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
             gap: 4 
           }}>
-            {skills.map(skill => (
-              <Box key={skill.id} sx={{ 
-                bgcolor: '#fff', 
-                border: '3px solid #000', 
-                p: 3, 
-                boxShadow: '8px 8px 0px #000',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                transition: 'transform 0.1s',
-                '&:hover': { transform: 'scale(1.02)' }
-              }}>
-                
-                {/* Header Skill: Ikon & Nama */}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: '#1125d6' }}>
-                    {getSkillIcon(skill.skill_name)}
-                    <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.5rem', color: '#000' }}>
-                      {skill.skill_name.toUpperCase()}
+            {skills.map(skill => {
+              // --- TAMBAHKAN DETEKSI BAHASA DI SINI ---
+              const langSuffix = i18n.language === 'id' ? 'id' : 'en';
+              const currentSkillName = skill[`skill_name_${langSuffix}`] || skill.skill_name_en;
+
+              return (
+                <Box key={skill.id} sx={{ 
+                  bgcolor: '#fff', 
+                  border: '3px solid #000', 
+                  p: 3, 
+                  boxShadow: '8px 8px 0px #000',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  transition: 'transform 0.1s',
+                  '&:hover': { transform: 'scale(1.02)' }
+                }}>
+                  
+                  {/* Header Skill: Ikon & Nama */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: '#1125d6' }}>
+                      
+                      {/* UBAH DI SINI: pakai currentSkillName */}
+                      {getSkillIcon(currentSkillName)} 
+                      
+                      <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.5rem', color: '#000' }}>
+                        
+                        {/* UBAH JUGA DI SINI: pakai currentSkillName */}
+                        {currentSkillName.toUpperCase()} 
+                        
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.2rem', color: '#f23a18' }}>
+                      {skill.percentage}%
                     </Typography>
                   </Box>
-                  <Typography sx={{ fontFamily: "'Anton', sans-serif", fontSize: '1.2rem', color: '#f23a18' }}>
-                    {skill.percentage}%
-                  </Typography>
-                </Box>
 
-                {/* Progress Bar Brutalism (Kotak-kotak) */}
-                <Box sx={{ 
-                  height: '24px', 
-                  width: '100%', 
-                  border: '2px solid #000', 
-                  bgcolor: '#eee',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
+                  {/* Progress Bar Brutalism (Kotak-kotak) */}
                   <Box sx={{ 
-                    height: '100%', 
-                    width: `${skill.percentage}%`, 
-                    bgcolor: '#ffed00', 
-                    borderRight: '2px solid #000'
-                  }} />
-                </Box>
+                    height: '24px', 
+                    width: '100%', 
+                    border: '2px solid #000', 
+                    bgcolor: '#eee',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <Box sx={{ 
+                      height: '100%', 
+                      width: `${skill.percentage}%`, 
+                      bgcolor: '#ffed00', 
+                      borderRight: '2px solid #000'
+                    }} />
+                  </Box>
 
-              </Box>
-            ))}
+                </Box>
+              );
+            })}
           </Box>
         )}
       </Container>

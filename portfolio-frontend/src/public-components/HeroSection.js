@@ -5,7 +5,7 @@ import { Container, Typography, Box } from '@mui/material';
 import ArrowIcon from './icons/ArrowIcon';
 import { useTranslation } from 'react-i18next';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const HeroSection = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -38,6 +38,10 @@ const HeroSection = () => {
       </Box>
     );
   }
+
+  // --- TAMBAHKAN INI SEBELUM RETURN ---
+  const langSuffix = i18n.language === 'id' ? 'id' : 'en';
+  const heroBioText = userInfo[`hero_bio_${langSuffix}`] || userInfo.hero_bio;
 
   return (
     <Box 
@@ -117,14 +121,15 @@ const HeroSection = () => {
               <Typography 
                 variant="h5" 
                 sx={{ 
-                  fontFamily: "'Inter', sans-serif", // Font body tebal
+                  fontFamily: "'Inter', sans-serif", 
                   fontWeight: 800,
                   fontSize: { xs: '1rem', md: '1.2rem' },
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}
               >
-                {userInfo.hero_bio || t('hero_bio')}
+                {/* UBAH BARIS INI */}
+                {heroBioText || t('hero_bio')}
               </Typography>
             </Box>
             
@@ -137,18 +142,27 @@ const HeroSection = () => {
             {userInfo.profile_picture_url && (
               <Box 
                 component="img"
-                src={userInfo.profile_picture_url.startsWith('http') ? userInfo.profile_picture_url : `${BACKEND_URL}${userInfo.profile_picture_url}`}
+                // --- KODE PEMBERSIH MULAI DI SINI ---
+                src={
+                  (() => {
+                    let rawUrl = userInfo.profile_picture_url;
+                    if (rawUrl && rawUrl.includes('/public')) {
+                      rawUrl = rawUrl.replace('/public', '');
+                    }
+                    return rawUrl.startsWith('http') ? rawUrl : `${BACKEND_URL}${rawUrl}`;
+                  })()
+                }
+                // --- KODE PEMBERSIH SELESAI ---
                 alt={userInfo.full_name}
                 sx={{ 
                   width: '100%', 
                   maxWidth: { xs: '280px', md: '400px' }, 
                   height: { xs: '350px', md: '500px' }, 
                   objectFit: 'cover',
-                  // Menghapus borderRadius: '12px' peninggalan desain lama
                   borderRadius: '0px', 
                   border: '4px solid #000',
-                  bgcolor: '#ffed00', // Warna background kuning kalau fotonya transparan
-                  boxShadow: '12px 12px 0px #f23a18, 12px 12px 0px 4px #000', // Dobel bayangan brutalism (Merah + Hitam)
+                  bgcolor: '#ffed00', 
+                  boxShadow: '12px 12px 0px #f23a18, 12px 12px 0px 4px #000', 
                   transition: 'transform 0.2s ease',
                   '&:hover': {
                     transform: 'translate(-4px, -4px)',

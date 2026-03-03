@@ -7,7 +7,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CakeIcon from '@mui/icons-material/Cake';
 import InterestsIcon from '@mui/icons-material/Interests';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const AboutSection = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -30,7 +30,14 @@ const AboutSection = () => {
         i18n.language === 'en' ? 'en-US' : 'id-ID',
         { day: 'numeric', month: 'long', year: 'numeric' }
       )
+      
     : '-';
+
+    // --- TAMBAHKAN INI SEBELUM RETURN ---
+  const langSuffix = i18n.language === 'id' ? 'id' : 'en';
+  const aboutDesc = userInfo[`about_description_${langSuffix}`] || userInfo.about_description;
+  const locationText = userInfo[`location_${langSuffix}`] || userInfo.location;
+  const hobbiesText = userInfo[`hobbies_${langSuffix}`] || userInfo.hobbies;    
 
   return (
     <Box id="about" sx={{ py: 15, bgcolor: '#ffed00', color: '#000', borderBottom: '4px solid #000' }}>
@@ -54,7 +61,18 @@ const AboutSection = () => {
                 }} />
                 <Box 
                   component="img" 
-                  src={userInfo.about_image_url?.startsWith('http') ? userInfo.about_image_url : `${BACKEND_URL}${userInfo.about_image_url}`}
+                  // --- KODE PEMBERSIH MULAI DI SINI ---
+                  src={
+                    (() => {
+                      let rawUrl = userInfo.about_image_url;
+                      if (!rawUrl) return 'https://via.placeholder.com/450?text=NO+IMAGE';
+                      if (rawUrl.includes('/public')) {
+                        rawUrl = rawUrl.replace('/public', '');
+                      }
+                      return rawUrl.startsWith('http') ? rawUrl : `${BACKEND_URL}${rawUrl}`;
+                    })()
+                  }
+                  // --- KODE PEMBERSIH SELESAI ---
                   alt="About Me"
                   sx={{
                     width: '100%',
@@ -97,7 +115,7 @@ const AboutSection = () => {
                 fontWeight: 600,
                 fontFamily: "'Inter', sans-serif"
               }}>
-                {userInfo.about_description}
+                {aboutDesc || t('about_description')}
               </Typography>
             </Box>
 
@@ -131,7 +149,7 @@ const AboutSection = () => {
                   <LocationOnIcon sx={{ color: '#1125d6' }} />
                   <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase' }}>{t('location_label', 'BASE')}</Typography>
                 </Box>
-                <Typography sx={{ fontWeight: 800 }}>{userInfo.location || '-'}</Typography>
+                <Typography sx={{ fontWeight: 800 }}>{locationText || '-'}</Typography>
               </Box>
 
               {/* Box Hobi */}
@@ -146,7 +164,7 @@ const AboutSection = () => {
                   <InterestsIcon sx={{ color: '#f23a18' }} />
                   <Typography variant="caption" sx={{ fontWeight: 900, textTransform: 'uppercase' }}>{t('hobbies_label', 'LIKES')}</Typography>
                 </Box>
-                <Typography sx={{ fontWeight: 800 }}>{userInfo.hobbies || '-'}</Typography>
+                <Typography sx={{ fontWeight: 800 }}>{hobbiesText || '-'}</Typography>
               </Box>
 
             </Box>

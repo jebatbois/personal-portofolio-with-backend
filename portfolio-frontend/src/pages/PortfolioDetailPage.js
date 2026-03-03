@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import Navbar from '../public-components/Navbar';
 import Footer from '../public-components/Footer';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const PortfolioDetailPage = () => {
   const { id } = useParams();
@@ -72,10 +72,14 @@ const PortfolioDetailPage = () => {
 
   const description = project[`description_${lang}`] || 'No description available.';
   // Cek apakah URL sudah mengandung 'http', jika tidak tambahkan BACKEND_URL
-  const coverImage = project.image_url 
-    ? (project.image_url.startsWith('http') ? project.image_url : `${BACKEND_URL}${project.image_url}`) 
+ // --- JURUS PEMBERSIH URL GAMBAR UTAMA ---
+  let rawCoverImage = project.image_url;
+  if (rawCoverImage && rawCoverImage.includes('/public')) {
+    rawCoverImage = rawCoverImage.replace('/public', '');
+  }
+  const coverImage = rawCoverImage 
+    ? (rawCoverImage.startsWith('http') ? rawCoverImage : `${BACKEND_URL}${rawCoverImage}`) 
     : 'https://via.placeholder.com/900x500/1125d6/ffed00?text=NO+IMAGE';
-
   return (
     <>
       <Navbar />
@@ -263,14 +267,18 @@ const PortfolioDetailPage = () => {
                         }
                       }}
                     >
-                      <img
-                        // Cek URL untuk gambar galeri juga
-                        src={image.image_url.startsWith('http') ? image.image_url : `${BACKEND_URL}${image.image_url}`}
+                     <img
+                        // --- JURUS PEMBERSIH URL GALERI ---
+                        src={(() => {
+                          let imgUrl = image.image_url;
+                          if (imgUrl && imgUrl.includes('/public')) imgUrl = imgUrl.replace('/public', '');
+                          return imgUrl ? (imgUrl.startsWith('http') ? imgUrl : `${BACKEND_URL}${imgUrl}`) : '';
+                        })()}
                         alt={`Gallery ${index}`}
                         style={{
                           width: '100%',
                           maxHeight: '100%',
-                          objectFit: 'contain', // agar gambar tidak terpotong
+                          objectFit: 'contain',
                           display: 'block',
                           borderRadius: '6px'
                         }}

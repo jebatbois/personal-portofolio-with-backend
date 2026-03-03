@@ -13,7 +13,7 @@ const AdminLoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('https://personal-portofolio-with-backend.vercel.app/api/auth/login', { username, password });
+      const response = await axios.post('https://rifqy-api.gt.tc/api/auth/login', { username, password });
       if (response.data.success) {
         localStorage.setItem('authToken', response.data.token);
         navigate('/admin/dashboard');

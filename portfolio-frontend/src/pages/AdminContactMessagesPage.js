@@ -10,7 +10,7 @@ const AdminContactMessagesPage = () => {
   const fetchMessages = async () => {
     const token = localStorage.getItem('authToken');
     try {
-      const response = await axios.get('https://personal-portofolio-with-backend.vercel.app/api/contact', {
+      const response = await axios.get('https://rifqy-api.gt.tc/api/contact', {
         headers: { Authorization: token }
       });
       setMessages(response.data);
@@ -28,7 +28,7 @@ const AdminContactMessagesPage = () => {
     if (window.confirm("Apakah Anda yakin ingin menghapus pesan ini?")) {
       const token = localStorage.getItem('authToken');
       try {
-        await axios.delete(`https://personal-portofolio-with-backend.vercel.app/api/contact/${id}`, { headers: { Authorization: token } });
+        await axios.delete(`https://rifqy-api.gt.tc/api/contact/${id}`, { headers: { Authorization: token } });
         alert('Pesan berhasil dihapus!');
         fetchMessages(); // Ambil ulang data setelah menghapus
       } catch (error) {

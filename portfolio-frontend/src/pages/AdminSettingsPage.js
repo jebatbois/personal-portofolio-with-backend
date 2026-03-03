@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, Box, Paper, Alert, CircularProgress } from '@mui/material';
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const AdminSettingsPage = () => {
   // Semua state dideklarasikan di dalam komponen

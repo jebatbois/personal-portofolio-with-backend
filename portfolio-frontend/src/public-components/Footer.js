@@ -11,7 +11,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import EmailIcon from '@mui/icons-material/Email';
 import { FaSpotify } from 'react-icons/fa'; // Import Spotify
 
-const BACKEND_URL = 'https://personal-portofolio-with-backend.vercel.app';
+const BACKEND_URL = 'https://rifqy-api.gt.tc';
 
 const Footer = () => {
   const { t, i18n } = useTranslation('common');
